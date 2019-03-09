@@ -6,9 +6,6 @@
 
 
 #define NIL		-1
-#define WHITE	0
-#define GRAY	1
-#define BLACK	2
 #define CONNECTED	1
 
 int time;
@@ -36,19 +33,6 @@ Net read_input() {
 	}
 
 	return net;
-}
-
-void get_adjacents(Net net, Item item, Vector adjs) {
-	int N = net->_n_routers;
-	int count_adjs = 0;
-	Item* items = net->_routers_vec->_item_array;
-
-	for (int i = 0; i < N; i++) {
-		if (count_adjs != item->_in && net_get_value(net, item->_id, i+1) == CONNECTED) {
-			vector_insert(adjs, count_adjs, items[i]);
-			count_adjs++;
-		}
-	}
 }
 
 void DFS_visit(Net net, Item u) {
@@ -109,7 +93,8 @@ int main() {
 
 	DFS(net);
 
-	Item* items = net->_routers_vec->_item_array;
+	Item* items = net->_routers_vec->_item_array; //Not relevant here but improve abstraction
+
 
 	for (int i = 0; i < n; i++) {
 		Item u = items[i];

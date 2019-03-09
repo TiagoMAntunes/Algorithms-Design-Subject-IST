@@ -37,7 +37,6 @@ void net_update_value(Net n, int x, int y, int val) {
 }
 
 int net_get_value(Net n, int x, int y) {
-	//printf("Position: %d\n", get_validated_index(n,x,y));
 	return n->_routers_matrix[get_validated_index(n,x,y)]; 
 }
 
@@ -48,8 +47,8 @@ void net_add_connection(Net net, int u, int v) {
 
 	Vector routers = net->_routers_vec;
 	// u and v are the nodes' ids, hense the -1
-	add_in(routers->_item_array[u-1]);
-	add_in(routers->_item_array[v-1]);
+	add_in(vector_at(routers, u-1));
+	add_in(vector_at(routers, v-1));
 }
 
 void net_remove_connection(Net net, int u, int v) {
@@ -61,4 +60,16 @@ void delete_net(Net n) {
 	free(n->_routers_matrix);
 	delete_vector(n->_routers_vec, delete_item);
 	free(n);
+}
+
+void get_adjacents(Net net, Item item, Vector adjs) {
+	int N = net->_n_routers;
+	int count_adjs = 0;
+
+	for (int i = 0; i < N; i++) {
+		if (count_adjs != item->_in && net_get_value(net, item->_id, i+1) == CONNECT) {
+			vector_insert(adjs, count_adjs, vector_at(net->_routers_vec, i));
+			count_adjs++;
+		}
+	}
 }

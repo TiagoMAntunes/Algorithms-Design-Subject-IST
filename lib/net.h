@@ -16,4 +16,5 @@ void net_update_value(Net n, int x, int y, int val);
 void net_add_connection(Net net, int u, int v);
 void net_remove_connection(Net net, int u, int v);
 void delete_net(Net n);
+void get_adjacents(Net net, Item item, Vector adjs);
 #endif
