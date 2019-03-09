@@ -5,20 +5,15 @@
 #include "lib/net.h"
 
 
-Net read_input(char* filename) {
-
-	FILE *fp = fopen(filename, "r");
-	if (fp == NULL) {
-		fprintf(stderr,"Error opening file.");
-	}
+Net read_input() {
 
 	int N, M, i;
-	if (fscanf(fp, "%d", &N) != 1) {
-		fprintf(stderr,"Error reading file.");
+	if (scanf("%d", &N) != 1) {
+		fprintf(stderr,"Error reading input.");
 	}
 
-	if (fscanf(fp, "%d", &M) != 1) {
-		fprintf(stderr,"Error reading file.");
+	if (scanf("%d", &M) != 1) {
+		fprintf(stderr,"Error reading input.");
 	}
 
 	Net net = net_alloc(N);
@@ -26,7 +21,7 @@ Net read_input(char* filename) {
 	for (i = 0; i < M; i++) {
 		int u;
 		int v;
-		if (fscanf(fp, "%d", &u) != 1 || fscanf(fp, "%d", &v) != 1) {
+		if (scanf("%d", &u) != 1 || scanf("%d", &v) != 1) {
 			fprintf(stderr, "Error reading file.");
 		}
 		net_add_connection(net, u, v);
@@ -34,8 +29,6 @@ Net read_input(char* filename) {
 
 	return net;
 }
-
-
 
 int main() {
 	Net net = read_input("ex2.txt");
