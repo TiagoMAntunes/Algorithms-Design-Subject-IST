@@ -20,7 +20,7 @@ Net net_alloc(int n) {
 		vector_set(net->_routers_vec, i, create_item(i+1));
 
 	//Matrix is just made of ints
-	net->_routers_matrix = (int *) malloc(sizeof(int) * n * n);
+	net->_routers_matrix = (int *) calloc(n*n, sizeof(int));
 	if (!net->_routers_matrix) {
 		fprintf(stderr, "Error with malloc.");
 	}
@@ -55,4 +55,10 @@ void net_add_connection(Net net, int u, int v) {
 void net_remove_connection(Net net, int u, int v) {
 	net_update_value(net, u, v, DISCONNECT);
 	net_update_value(net, v, u, DISCONNECT);
+}
+
+void delete_net(Net n) {
+	free(n->_routers_matrix);
+	delete_vector(n->_routers_vec, delete_item);
+	free(n);
 }

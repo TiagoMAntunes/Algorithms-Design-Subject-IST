@@ -51,19 +51,17 @@ void get_adjacents(Net net, Item item, Vector adjs) {
 	}
 }
 
-
 void DFS_visit(Net net, Item u) {
 	time++;
 	u->_d = time;
 	u->_color = GRAY;
 
 	Vector adjs_vector = create_vector(u->_in);
-	Item* adjs = adjs_vector->_item_array;
 
 	get_adjacents(net, u, adjs_vector);
 
 	for (int i = 0; i < u->_in; i++) {
-		Item v = adjs[i];
+		Item v = vector_at(adjs_vector,i);
 		if (v->_color == WHITE) {
 			v->_pi = u->_id;
 			DFS_visit(net, v);
@@ -73,7 +71,7 @@ void DFS_visit(Net net, Item u) {
 	time++;
 	u->_f = time;
 
-	free(adjs);
+    delete_vector(adjs_vector, NULL);
 }
 
 void DFS(Net net) {
@@ -119,6 +117,6 @@ int main() {
 	}
 
 	printf("====\n");
-
+    delete_net(net);
 	return 0;
 }

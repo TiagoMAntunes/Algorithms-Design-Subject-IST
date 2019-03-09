@@ -57,12 +57,15 @@ void vector_insert(Vector v, int index, Item val) {
 void vector_set(Vector v, int index, Item val) {
     if (v->_item_array[index])
         delete_item(v->_item_array[index]);
+    else
+        v->_num_elements++;
     v->_item_array[index] = val;
 }
 
 void delete_vector(Vector v, void (*f)()) {
-    for (int i = 0; i < v->_num_elements; i++)
-        f(vector_at(v, i));
+    if (f != NULL)
+        for (int i = 0; i < v->_num_elements; i++)
+            f(vector_at(v, i));
     free(v->_item_array);
     free(v);
 }
