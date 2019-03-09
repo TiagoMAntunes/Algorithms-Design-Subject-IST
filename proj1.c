@@ -7,6 +7,7 @@
 
 #define NIL		-1
 #define CONNECTED	1
+#define MIN(A, B) ((A) < (B) ? (A) : (B))
 
 int time;
 
@@ -35,11 +36,11 @@ Net read_input() {
 	return net;
 }
 
-void DFS_visit(Net net, Item u) {
+void DFS_visit(Net net, Item u, int low[]) {
 	time++;
 	u->_d = time;
 	u->_color = GRAY;
-
+    low[u->_id - 1] = time;
 	Vector adjs_vector = create_vector(u->_in);
 
 	get_adjacents(net, u, adjs_vector);
@@ -48,8 +49,14 @@ void DFS_visit(Net net, Item u) {
 		Item v = vector_at(adjs_vector,i);
 		if (v->_color == WHITE) {
 			v->_pi = u->_id;
-			DFS_visit(net, v);
-		}
+			DFS_visit(net, v, low);
+            low[u->_id - 1] = MIN(low[u->_id - 1], low[v->_id - 1]);
+            if (low[v->_id - 1] > u->_d)
+                printf("PONTE ENCONTRADA. IDS: %d para %d\n", u->_id, v->_id);
+            //it's supposed to happen something in the if above
+		} else if (v->_id != u->_pi) { //if the vertex isn't where it came from
+            low[u->_id -1] = MIN(low[u->_id - 1], v->_d);
+        }
 	}
 	u->_color = BLACK;
 	time++;
@@ -59,8 +66,13 @@ void DFS_visit(Net net, Item u) {
 }
 
 void DFS(Net net) {
-	int i, time, N = net->_n_routers;
+	int i, N = net->_n_routers;
 	Item* items = net->_routers_vec->_item_array;
+    int low[N];
+    
+    for (i = 0; i < N; i++){
+        low[i] = NIL;
+    }
 
 	for (i = 0; i < N; i++) {
 		items[i]->_color = WHITE;
@@ -70,7 +82,7 @@ void DFS(Net net) {
 	time = 0;
 	for (i = 0; i < N; i++) {
 		if (items[i]->_color == WHITE) {
-			DFS_visit(net, items[i]);
+			DFS_visit(net, items[i], low);
 		}
 	}
 }
@@ -78,7 +90,6 @@ void DFS(Net net) {
 
 int main() {
 	Net net = read_input();
-
 	int n = net->_n_routers;
 
 	for (int i = 1; i <= n; i++) {
