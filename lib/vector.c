@@ -1,13 +1,13 @@
 #include "vector.h"
 #include <stdlib.h>
 
-#define BASE_SIZE 8;
-
-Vector create_vector() {
+Vector create_vector(int n) {
     Vector v = malloc(sizeof(struct vector_t));
-    v->_capacity = BASE_SIZE;
+    v->_capacity = n;
     v->_num_elements = 0;
     v->_item_array = malloc(sizeof(Item) * v->_capacity);
+    for (int i = 0; i < n; i++)
+        v->_item_array[i] = NULL;
     return v;
 }
 
@@ -52,6 +52,12 @@ void vector_insert(Vector v, int index, Item val) {
     v->_item_array[index] = val;
     v->_num_elements++;
     vector_validate_size(v);
+}
+
+void vector_set(Vector v, int index, Item val) {
+    if (v->_item_array[index])
+        delete_item(v->_item_array[index]);
+    v->_item_array[index] = val;
 }
 
 void delete_vector(Vector v, void (*f)()) {

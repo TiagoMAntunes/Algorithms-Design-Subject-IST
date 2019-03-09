@@ -4,10 +4,12 @@
 #include <stdlib.h>
 
 typedef struct item_t {
-    int j;
+    int _id, _in, _out;
 } * Item;
 
-Item create_item(int j);
+Item create_item(int id);
 void delete_item(Item i);
+
+
 
 #endif

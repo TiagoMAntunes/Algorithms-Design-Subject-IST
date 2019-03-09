@@ -9,7 +9,7 @@ typedef struct vector_t {
 } * Vector;
 
 //Constructor
-Vector create_vector(); //returns an empty vector with a base size;
+Vector create_vector(int n); //returns an empty vector with a base size;
 
 //Accessors
 Item vector_at(Vector v, int i); //returns the value at that position
@@ -21,7 +21,7 @@ int vector_capacity(Vector v); //returns the current capacity of a vector
 void vector_push_back(Vector v, Item val); //inserts at the end the value val
 Item vector_pop(Vector v); //removes and returns the last element
 void vector_insert(Vector v, int index, Item val); //inserts a value in an index
-
+void vector_set(Vector v, int indeex, Item val);
 //Deconstructor
 void delete_vector(Vector v, void (*item_free_function)());
 

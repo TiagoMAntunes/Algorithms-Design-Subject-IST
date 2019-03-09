@@ -4,7 +4,7 @@
 
 int main()
 {
-    Vector v = create_vector();
+    Vector v = create_vector(8);
 
     printf("Is vector empty? %s\n", vector_empty(v) ? "Yes" : "No");
 
@@ -27,18 +27,18 @@ int main()
 
     for (int i = 0; i < 10; i++)
     {
-        printf("Value at %d: %d\n", i, vector_at(v, i)->j);
+        printf("Value at %d: %d\n", i, vector_at(v, i)->_id);
     }
 
     Item i = vector_pop(v);
-    printf("Last item gets popped..: %d\n", i->j);
+    printf("Last item gets popped..: %d\n", i->_id);
     delete_item(i);
     printf("Now the size of the vector is: %d\n", vector_size(v));
 
     vector_insert(v, 3, create_item(20));
     for (int i = 0; i < 10; i++)
     {
-        printf("Value at %d: %d\n", i, vector_at(v, i)->j);
+        printf("Value at %d: %d\n", i, vector_at(v, i)->_id);
     }
 
     delete_vector(v, delete_item);

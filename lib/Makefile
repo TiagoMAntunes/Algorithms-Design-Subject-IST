@@ -8,12 +8,10 @@ LDFLAGS = -lm
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) $^ -o $(TARGET) $(LDFLAGS)
 
-vector_unit_test.o: vector_unit_test.c
 vector.o: vector.c vector.h
 item.o: item.c item.h
-
+net.o: net.c net.h
 
 $(OBJS):
 	$(CC) $(CFLAGS) -c -o $@ $<
