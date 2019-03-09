@@ -3,6 +3,9 @@
 #include <unistd.h>
 #include <stdio.h>
 
+#define CONNECT 	1
+#define DISCONNECT 	0
+
 Net net_alloc(int n) {
 	Net net = (Net) malloc(sizeof(struct net));
 	if (!net) {
@@ -39,11 +42,11 @@ int net_get_value(Net n, int x, int y) {
 
 
 void net_add_connection(Net net, int u, int v) {
-	net_update_value(net, u, v, 1);
-	net_update_value(net, v, u, 1);
+	net_update_value(net, u, v, CONNECT);
+	net_update_value(net, v, u, CONNECT);
 }
 
 void net_remove_connection(Net net, int u, int v) {
-	net_update_value(net, u, v, 0);
-	net_update_value(net, v, u, 0);
+	net_update_value(net, u, v, DISCONNECT);
+	net_update_value(net, v, u, DISCONNECT);
 }
