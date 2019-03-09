@@ -1,4 +1,5 @@
 #include "item.h"
+#include <stdio.h>
 
 Item create_item(int id)
 {
@@ -11,4 +12,12 @@ Item create_item(int id)
 
 void delete_item(Item i) {
     free(i);
+}
+
+void add_in(Item i) {
+	i->_in++;
+}
+
+void add_out(Item i) {
+	i->_out++;
 }

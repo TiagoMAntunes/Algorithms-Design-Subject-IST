@@ -1,4 +1,5 @@
 #include "net.h"
+#include "item.h"
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -44,6 +45,11 @@ int net_get_value(Net n, int x, int y) {
 void net_add_connection(Net net, int u, int v) {
 	net_update_value(net, u, v, CONNECT);
 	net_update_value(net, v, u, CONNECT);
+
+	Vector routers = net->_routers_vec;
+	// u and v are the nodes' ids, hense the -1
+	add_in(routers->_item_array[u-1]);
+	add_in(routers->_item_array[v-1]);
 }
 
 void net_remove_connection(Net net, int u, int v) {
