@@ -5,14 +5,15 @@ Vector create_vector(int n) {
     Vector v = malloc(sizeof(struct vector_t));
     v->_capacity = n;
     v->_num_elements = 0;
-    v->_item_array = malloc(sizeof(Item) * v->_capacity);
+    v->_item_array = calloc(v->_capacity,sizeof(Item));
     for (int i = 0; i < n; i++)
         v->_item_array[i] = NULL;
     return v;
 }
 
 Item vector_at(Vector v, int i) {
-    return v->_item_array[i]; //if out of index, returns null
+    
+    return i < v->_capacity ? v->_item_array[i] : NULL; //if out of index, returns null
 }
 
 int vector_size(Vector v) {
@@ -57,7 +58,6 @@ void vector_insert(Vector v, int index, Item val) {
 void vector_add_at(Vector v, int index, Item val) {
     if (v->_item_array[index] == NULL) {
         v->_item_array[index] = val;
-        v->_num_elements++;
     }
 }
 
@@ -75,8 +75,4 @@ void delete_vector(Vector v, void (*f)()) {
             f(vector_at(v, i));
     free(v->_item_array);
     free(v);
-}
-
-Item* vector_get_items(Vector v) {
-    return v->_item_array;
 }

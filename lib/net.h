@@ -20,7 +20,7 @@ void delete_net(Net n);
 void get_adjacents(Net net, Item item, Vector adjs);
 void net_add_art_point(Net net, int i, Item item);
 int net_get_N_art_points(Net net);
-Item* net_get_art_points(Net net);
-Item* net_get_items(Net net);
+Vector net_get_art_points(Net net);
 int net_count_subnets(Net net);
+Net net_create_remove_articulations(Net net);
 #endif

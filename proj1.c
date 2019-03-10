@@ -98,8 +98,6 @@ void DFS(Net net) {
 	}
 }
 
-
-
 int main() {
 	Net net = read_input();
 	int n = net->_n_routers;
@@ -118,11 +116,11 @@ int main() {
 	DFS(net);
 
 	printf("Articulation points:\n");
-	Item* ap = net_get_art_points(net);
+	Vector ap = net_get_art_points(net);
 	for (i = 0; i < n; i++) {
-		if (ap[i]) {
-			printf("%d\n", ap[i]->_id);
-		}
+		if (vector_at(ap,i)) {
+			printf("%d\n", vector_at(ap,i)->_id);
+		}	
 	}
 
 	printf("=======\n");
@@ -133,7 +131,15 @@ int main() {
 	//Net new_net = net_alloc(net->_n_routers - net_get_N_art_points(net));
 
 	// build new net without the ap's and do the DFS
+	Vector points = net_get_art_points(net);
+	printf("Articulated points: ");
+	for (i = 0; i < vector_capacity(points); i++)
+		if(vector_at(points, i) != NULL)
+			printf("%d ", vector_at(points, i)->_id);
+	printf("\n");
 
+	printf("New net!\n");
+	Net new_net = net_create_remove_articulations(net);
 	
 
 	printf("==== Results ====\n");
@@ -142,5 +148,6 @@ int main() {
 	printf("%d\n", net_get_N_art_points(net));
 	printf("XXX\n");
     delete_net(net);
+	delete_net(new_net);
 	return 0;
 }

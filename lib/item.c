@@ -23,4 +23,5 @@ void add_in(Item i) {
 
 void add_out(Item i) {
 	i->_out++;
+    printf("Incremented ID: %d\n", i->_id);
 }
