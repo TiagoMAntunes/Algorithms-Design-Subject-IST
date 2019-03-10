@@ -76,3 +76,7 @@ void delete_vector(Vector v, void (*f)()) {
     free(v->_item_array);
     free(v);
 }
+
+void vector_sort(Vector v, int (*key)()) {
+    qsort(v->_item_array, v->_num_elements, sizeof(Item), key);
+}

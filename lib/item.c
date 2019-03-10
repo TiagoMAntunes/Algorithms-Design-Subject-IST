@@ -23,5 +23,13 @@ void add_in(Item i) {
 
 void add_out(Item i) {
 	i->_out++;
-    printf("Incremented ID: %d\n", i->_id);
+}
+
+int item_id_sort(Item a, Item b) {
+    if (a->_id > b->_id)
+        return 1;
+    else if (a->_id == b->_id)
+        return 0;
+    else
+        return -1;
 }

@@ -36,7 +36,7 @@ Net read_input() {
 	return net;
 }
 
-void DFS_visit(Net net, Item u, int low[]) {
+int DFS_visit(Net net, Item u, int low[]) {
 	time++;
 	u->_d = time;
 	u->_color = GRAY;
@@ -45,13 +45,14 @@ void DFS_visit(Net net, Item u, int low[]) {
 	int children = 0;
 
 	get_adjacents(net, u, adjs_vector);
-
+	int val = u->_id;
 	for (int i = 0; i < u->_in; i++) {
 		Item v = vector_at(adjs_vector,i);
 		if (v->_color == WHITE) {
 			children++;
 			v->_pi = u->_id;
-			DFS_visit(net, v, low);
+			int tmp = DFS_visit(net, v, low);
+			if (tmp > val) val = tmp;
 
             low[u->_id - 1] = MIN(low[u->_id - 1], low[v->_id - 1]);   
 
@@ -74,15 +75,16 @@ void DFS_visit(Net net, Item u, int low[]) {
 	u->_f = time;
 
     delete_vector(adjs_vector, NULL);
+	return val;
 }
 
 
 
-void DFS(Net net) {
+Vector DFS(Net net) {
 	int i, N = net->_n_routers;
 	Item* items = net->_routers_vec->_item_array;
     int low[N];
-    
+	Vector subnets_maxs = create_vector(1);
  
 	for (i = 0; i < N; i++) {
 		items[i]->_color = WHITE;
@@ -92,25 +94,23 @@ void DFS(Net net) {
 
 	time = 0;
 	for (i = 0; i < N; i++) {
-		if (items[i]->_color == WHITE) {
-			DFS_visit(net, items[i], low);
-		}
+		if (items[i]->_color == WHITE)
+			vector_push_back(subnets_maxs, create_item(DFS_visit(net, items[i], low)));
 	}
+	return subnets_maxs;
 }
 
 int main() {
 	Net net = read_input();
-	int n = net->_n_routers;
 	int i;
 
-	DFS(net);
-	int subnets = net_count_subnets(net);
+	Vector subnets_net = DFS(net);
 
 	// build new net without the ap's and do the DFS
-	Vector points = net_get_art_points(net);
 	Net new_net = net_create_remove_articulations(net);
-	DFS(new_net);
 
+
+	delete_vector(DFS(new_net), delete_item);
 	int biggest_size = 0;
 	for (int i = 0; i < new_net->_n_routers; i++) {
 		Item item = vector_at(new_net->_routers_vec,i);
@@ -119,15 +119,26 @@ int main() {
 				biggest_size = (item->_f / 2) - item->_d + 1;
 	}
 
+	//Number of subnets
+	printf("%d\n", vector_size(subnets_net));
 	
-	printf("%d\n", subnets);
-	printf("XXX\n");
+	//Id's of subnets
+	vector_sort(subnets_net, item_id_sort);
+	for (i = 0; i < vector_size(subnets_net); i++) {
+		printf("%d ", vector_at(subnets_net, i)->_id);
+	}
+	printf("\n");
+	delete_vector(subnets_net, delete_item);
+
+	//Number of points that are dangerous
 	printf("%d\n", net_get_N_art_points(net));
-	printf("XXX\n");
-	printf("Biggest size: %d\n", biggest_size);
+
+	//Biggest size of sub net
+	printf("%d", biggest_size);
 
 	//clean up
     delete_net(net);
 	delete_net(new_net);
+
 	return 0;
 }

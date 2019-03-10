@@ -39,7 +39,6 @@ int get_validated_index(Net n, int u, int v) {
 
 void net_update_value(Net n, int x, int y, int val) {
 	n->_routers_matrix[get_validated_index(n,x,y)] = val;
-	printf("Updating value in %d %d\n", x, y);
 }
 
 int net_get_value(Net n, int x, int y) {
@@ -106,7 +105,6 @@ int net_count_subnets(Net net) {
 
 	for (int i = 0; i < n; i++) {
 		Item u = vector_at(items,i);
-		printf("d = %d, f = %d, pi = %d\n", u->_d, u->_f, u->_pi);	//to remove
 		if (u->_pi == NIL) {
 			subnets++;
 		}

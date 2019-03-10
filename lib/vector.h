@@ -23,6 +23,7 @@ Item vector_pop(Vector v); //removes and returns the last element
 void vector_insert(Vector v, int index, Item val); //inserts a value in an index
 void vector_add_at(Vector v, int index, Item val);
 void vector_set(Vector v, int indeex, Item val);
+void vector_sort(Vector v, int (*key)());
 //Deconstructor
 void delete_vector(Vector v, void (*item_free_function)());
 Item* vector_get_items(Vector v);
