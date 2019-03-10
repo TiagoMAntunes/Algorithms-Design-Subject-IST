@@ -103,50 +103,30 @@ int main() {
 	int n = net->_n_routers;
 	int i;
 
-	for (i = 1; i <= n; i++) {
-		for (int j = i + 1; j <= n; j++) {
-
-			if (net_get_value(net, i, j) == 1) {
-				printf("%d %d\n", i, j);
-			} 
-		}
-	}
-	printf("==== DFS ====\n");
-
 	DFS(net);
-
-	printf("Articulation points:\n");
-	Vector ap = net_get_art_points(net);
-	for (i = 0; i < n; i++) {
-		if (vector_at(ap,i)) {
-			printf("%d\n", vector_at(ap,i)->_id);
-		}	
-	}
-
-	printf("=======\n");
-
-
 	int subnets = net_count_subnets(net);
-
-	//Net new_net = net_alloc(net->_n_routers - net_get_N_art_points(net));
 
 	// build new net without the ap's and do the DFS
 	Vector points = net_get_art_points(net);
-	printf("Articulated points: ");
-	for (i = 0; i < vector_capacity(points); i++)
-		if(vector_at(points, i) != NULL)
-			printf("%d ", vector_at(points, i)->_id);
-	printf("\n");
-
-	printf("New net!\n");
 	Net new_net = net_create_remove_articulations(net);
-	
+	DFS(new_net);
 
-	printf("==== Results ====\n");
+	int biggest_size = 0;
+	for (int i = 0; i < new_net->_n_routers; i++) {
+		Item item = vector_at(new_net->_routers_vec,i);
+		if (item->_pi == NIL)
+			if ((item->_f / 2) - item->_d + 1 > biggest_size)
+				biggest_size = (item->_f / 2) - item->_d + 1;
+	}
+
+	
 	printf("%d\n", subnets);
 	printf("XXX\n");
 	printf("%d\n", net_get_N_art_points(net));
 	printf("XXX\n");
+	printf("Biggest size: %d\n", biggest_size);
+
+	//clean up
     delete_net(net);
 	delete_net(new_net);
 	return 0;
