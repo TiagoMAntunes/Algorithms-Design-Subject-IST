@@ -16,10 +16,12 @@ Net net_alloc(int n) {
 
 	net->_n_routers = n; //number of vertexs
 	net->_routers_vec = create_vector(n);
-	net->_n_articulation_points = 0;
+	net->_articulation_points = create_vector(n);
 
-	for (int i = 0; i < n; i++) 
+	for (int i = 0; i < n; i++) {
 		vector_set(net->_routers_vec, i, create_item(i+1));
+	}
+
 
 	//Matrix is just made of ints
 	net->_routers_matrix = (int *) calloc(n*n, sizeof(int));
@@ -62,6 +64,7 @@ void net_remove_connection(Net net, int u, int v) {
 void delete_net(Net n) {
 	free(n->_routers_matrix);
 	delete_vector(n->_routers_vec, delete_item);
+	free(n->_articulation_points);
 	free(n);
 }
 
@@ -77,12 +80,16 @@ void get_adjacents(Net net, Item item, Vector adjs) {
 	}
 }
 
-void net_add_art_point(Net net) {
-	net->_n_articulation_points++;
+void net_add_art_point(Net net, int i, Item item) {
+	vector_add_at(net->_articulation_points, i, item);
 }
 
 int net_get_N_art_points(Net net) {
-	return net->_n_articulation_points;
+	return vector_size(net->_articulation_points);
+}
+
+Item* net_get_art_points(Net net) {
+	return vector_get_items(net->_articulation_points);
 }
 
 Item* net_get_items(Net net) {

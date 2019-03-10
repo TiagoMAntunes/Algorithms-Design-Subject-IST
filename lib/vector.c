@@ -54,6 +54,13 @@ void vector_insert(Vector v, int index, Item val) {
     vector_validate_size(v);
 }
 
+void vector_add_at(Vector v, int index, Item val) {
+    if (v->_item_array[index] == NULL) {
+        v->_item_array[index] = val;
+        v->_num_elements++;
+    }
+}
+
 void vector_set(Vector v, int index, Item val) {
     if (v->_item_array[index])
         delete_item(v->_item_array[index]);

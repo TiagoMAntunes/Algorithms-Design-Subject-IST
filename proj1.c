@@ -36,7 +36,7 @@ Net read_input() {
 	return net;
 }
 
-void DFS_visit(Net net, Item u, int low[], int ap[]) {
+void DFS_visit(Net net, Item u, int low[]) {
 	time++;
 	u->_d = time;
 	u->_color = GRAY;
@@ -51,28 +51,20 @@ void DFS_visit(Net net, Item u, int low[], int ap[]) {
 		if (v->_color == WHITE) {
 			children++;
 			v->_pi = u->_id;
-			DFS_visit(net, v, low, ap);
+			DFS_visit(net, v, low);
 
-            low[u->_id - 1] = MIN(low[u->_id - 1], low[v->_id - 1]);
+            low[u->_id - 1] = MIN(low[u->_id - 1], low[v->_id - 1]);   
 
-            if (low[v->_id - 1] > u->_d) {
-                printf("PONTE ENCONTRADA. IDS: %d para %d\n", u->_id, v->_id);
-            
+	        // v is not root and low of one of its children is more that v's
+	        if (u->_pi != NIL && low[v->_id -1] >= u->_d) {
+	           	net_add_art_point(net, u->_id - 1, u);
+	        }
+        
+            // v is root and has 2 or more children
+	        if (u->_pi == NIL && children > 1) {
+	          	net_add_art_point(net, u->_id - 1, u);
+	         }
 
-           		//it's supposed to happen something in the if above
-
-	            // v is root and has 2 or more children
-	            if (u->_pi == NIL && children > 1) {
-	            	ap[u->_id] = u->_id;
-	            	net_add_art_point(net);
-	            }
-
-	            // v is not root and low of one of its children is more that v's
-	            if (u->_pi != NIL && low[v->_id -1] >= u->_d) {
-	            	ap[u->_id] = u->_id;
-	            	net_add_art_point(net);
-	            }
-            }
 		} else if (v->_id != u->_pi) { //if the vertex isn't where it came from
             low[u->_id -1] = MIN(low[u->_id - 1], v->_d);
         }
@@ -84,7 +76,9 @@ void DFS_visit(Net net, Item u, int low[], int ap[]) {
     delete_vector(adjs_vector, NULL);
 }
 
-void DFS(Net net, int ap[]) {
+
+
+void DFS(Net net) {
 	int i, N = net->_n_routers;
 	Item* items = net->_routers_vec->_item_array;
     int low[N];
@@ -99,7 +93,7 @@ void DFS(Net net, int ap[]) {
 	time = 0;
 	for (i = 0; i < N; i++) {
 		if (items[i]->_color == WHITE) {
-			DFS_visit(net, items[i], low, ap);
+			DFS_visit(net, items[i], low);
 		}
 	}
 }
@@ -109,13 +103,7 @@ void DFS(Net net, int ap[]) {
 int main() {
 	Net net = read_input();
 	int n = net->_n_routers;
-	int articulation_points[n];
 	int i;
-
-	for (i = 0; i < n; i++) {
-		articulation_points[i] = 0;
-	}
-
 
 	for (i = 1; i <= n; i++) {
 		for (int j = i + 1; j <= n; j++) {
@@ -127,13 +115,13 @@ int main() {
 	}
 	printf("==== DFS ====\n");
 
-	DFS(net, articulation_points);
+	DFS(net);
 
-	printf("=======\n");
 	printf("Articulation points:\n");
+	Item* ap = net_get_art_points(net);
 	for (i = 0; i < n; i++) {
-		if (articulation_points[i] != 0) {
-			printf("%d\n", articulation_points[i]);
+		if (ap[i]) {
+			printf("%d\n", ap[i]->_id);
 		}
 	}
 
@@ -141,6 +129,11 @@ int main() {
 
 
 	int subnets = net_count_subnets(net);
+
+	//Net new_net = net_alloc(net->_n_routers - net_get_N_art_points(net));
+
+	// build new net without the ap's and do the DFS
+
 	
 
 	printf("==== Results ====\n");
