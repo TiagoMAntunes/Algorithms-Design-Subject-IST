@@ -69,3 +69,7 @@ void delete_vector(Vector v, void (*f)()) {
     free(v->_item_array);
     free(v);
 }
+
+Item* vector_get_items(Vector v) {
+    return v->_item_array;
+}

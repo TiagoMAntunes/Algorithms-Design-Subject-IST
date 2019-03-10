@@ -6,6 +6,7 @@
 
 #define CONNECT 	1
 #define DISCONNECT 	0
+#define NIL			-1
 
 Net net_alloc(int n) {
 	Net net = (Net) malloc(sizeof(struct net));
@@ -15,6 +16,7 @@ Net net_alloc(int n) {
 
 	net->_n_routers = n; //number of vertexs
 	net->_routers_vec = create_vector(n);
+	net->_n_articulation_points = 0;
 
 	for (int i = 0; i < n; i++) 
 		vector_set(net->_routers_vec, i, create_item(i+1));
@@ -24,6 +26,7 @@ Net net_alloc(int n) {
 	if (!net->_routers_matrix) {
 		fprintf(stderr, "Error with malloc.");
 	}
+
 	return net;
 }
 
@@ -72,4 +75,31 @@ void get_adjacents(Net net, Item item, Vector adjs) {
 			count_adjs++;
 		}
 	}
+}
+
+void net_add_art_point(Net net) {
+	net->_n_articulation_points++;
+}
+
+int net_get_N_art_points(Net net) {
+	return net->_n_articulation_points;
+}
+
+Item* net_get_items(Net net) {
+	return vector_get_items(net->_routers_vec);
+}
+
+int net_count_subnets(Net net) {
+	Item* items = net_get_items(net);
+	int subnets = 0;
+	int n = net->_n_routers;
+
+	for (int i = 0; i < n; i++) {
+		Item u = items[i];
+		printf("d = %d, f = %d, pi = %d\n", u->_d, u->_f, u->_pi);	//to remove
+		if (u->_pi == NIL) {
+			subnets++;
+		}
+	}
+	return subnets;
 }

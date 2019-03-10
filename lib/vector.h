@@ -24,5 +24,6 @@ void vector_insert(Vector v, int index, Item val); //inserts a value in an index
 void vector_set(Vector v, int indeex, Item val);
 //Deconstructor
 void delete_vector(Vector v, void (*item_free_function)());
+Item* vector_get_items(Vector v);
 
 #endif
