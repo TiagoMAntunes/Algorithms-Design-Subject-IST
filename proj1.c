@@ -83,7 +83,7 @@ int DFS_visit(Net net, Item u, int low[]) {
 Vector DFS(Net net) {
 	int i, N = net->_n_routers;
 	Item* items = net->_routers_vec->_item_array;
-    int low[N];
+    int * low = calloc(sizeof(int),N);
 	Vector subnets_maxs = create_vector(1);
  
 	for (i = 0; i < N; i++) {

@@ -123,7 +123,7 @@ Net net_create_remove_articulations(Net net) {
 			for (int j = i; j < net->_n_routers; j++) { 
 				//because it's undirected, we just need to add from the diagonal to the front reducing the time that is needed
 				if (vector_at(net->_articulation_points, j) == NULL && net->_routers_matrix[net_get_value(net, i+1,j+1)] != DISCONNECT)
-					net_add_connection(new_net, i - count_articulations + 1, j - tmp + 1);
+					net_add_connection(new_net, i - count_articulations + 1, j - tmp - count_articulations + 1);
 				else if (vector_at(net->_articulation_points, j))
 					tmp++;
 			}
@@ -133,5 +133,4 @@ Net net_create_remove_articulations(Net net) {
 		}
 	}
 	return new_net;
-
 }
