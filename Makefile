@@ -11,6 +11,9 @@ all:
 proj1: proj1.c lib/item.o lib/net.o
 	$(CC) $(CFLAGS) $(wildcard lib/*.o) $< -o $(TARGET) $(LDFLAGS)
 
+prod:
+	python3 enfiatudo.py . lib/
+
 clean:
 	cd lib && make clean
 	rm proj1
