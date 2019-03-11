@@ -97,6 +97,7 @@ Vector DFS(Net net) {
 		if (items[i]->_color == WHITE)
 			vector_push_back(subnets_maxs, create_item(DFS_visit(net, items[i], low)));
 	}
+	free(low);
 	return subnets_maxs;
 }
 
