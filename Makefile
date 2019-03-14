@@ -1,5 +1,5 @@
 TARGET = proj1
-CFLAGS = -g -Wall
+CFLAGS = -Wall -O3 -ansi
 LDFLAGS = -lm
 CC = gcc
 

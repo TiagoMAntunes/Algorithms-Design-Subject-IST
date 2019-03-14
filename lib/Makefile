@@ -1,4 +1,4 @@
-CFLAGS = -g -Wall
+CFLAGS = -O3 -Wall -ansi
 SOURCES = $(wildcard *.c)
 OBJS = $(SOURCES:%.c=%.o)
 CC = gcc
