@@ -27,5 +27,6 @@ void vector_sort(Vector v, int (*key)());
 /* Deconstructor */
 void delete_vector(Vector v, void (*item_free_function)());
 Item* vector_get_items(Vector v);
-
+int vector_contains(Vector contains, Item item);
+void vector_remove(Vector v, int index);
 #endif

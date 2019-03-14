@@ -19,17 +19,20 @@ Net net_alloc(int n) {
 	net->_articulation_points = create_vector(n);
 
 	int i;
+	/* Creates all vertexs */
 	for (i = 0; i < n; i++) {
 		vector_set(net->_routers_vec, i, create_item(i+1));
 	}
 
 
-	/* Matrix is just made of ints */
-	net->_routers_matrix = (int *) calloc(n*n, sizeof(int));
+	/* Abstraction using list of adjacencies */
+	net->_routers_matrix = (Vector *) malloc(n * sizeof(Vector));
 	if (!net->_routers_matrix) {
-		fprintf(stderr, "Error with malloc.");
+		fprintf(stderr, "Error with malloc allocating %d.", n*n);
 	}
-
+	for (i = 0; i < n; i++){
+		net->_routers_matrix[i] = create_vector(8);
+	}
 	return net;
 }
 
@@ -38,18 +41,18 @@ int get_validated_index(Net n, int u, int v) {
 	return n->_n_routers * u + v;
 }
 
-void net_update_value(Net n, int x, int y, int val) {
-	n->_routers_matrix[get_validated_index(n,x,y)] = val;
+void net_update_value(Net n, int x, int y) {
+	vector_push_back(n->_routers_matrix[--x], vector_at(n->_routers_vec,--y));
 }
 
 int net_get_value(Net n, int x, int y) {
-	return n->_routers_matrix[get_validated_index(n,x,y)]; 
+	return DISCONNECT;
 }
 
 
 void net_add_connection(Net net, int u, int v) {
-	net_update_value(net, u, v, CONNECT);
-	net_update_value(net, v, u, CONNECT);
+	net_update_value(net, u, v);
+	net_update_value(net, v, u);
 
 	Vector routers = net->_routers_vec;
 	/* u and v are the nodes' ids, hense the -1 */
@@ -58,33 +61,27 @@ void net_add_connection(Net net, int u, int v) {
 }
 
 void net_remove_connection(Net net, int u, int v) {
-	net_update_value(net, u, v, DISCONNECT);
-	net_update_value(net, v, u, DISCONNECT);
+	net_update_value(net, u, v);
+	net_update_value(net, v, u);
 }
 
 void delete_net(Net n) {
-	free(n->_routers_matrix);
+	int i;
+	for (i = 0; i < n->_n_routers; i++)
+		delete_vector(n->_routers_matrix[i], NULL);
 	delete_vector(n->_routers_vec, delete_item);
-	delete_vector(n->_articulation_points, NULL);
+	free(n->_routers_matrix);
 	free(n);
 }
 
-void get_adjacents(Net net, Item item, Vector adjs) {
-	int N = net->_n_routers;
-	int i, count_adjs = 0;
-
-	for (i = 0; i < N; i++) {
-		if (count_adjs != item->_in && net_get_value(net, item->_id, i+1) == CONNECT) {
-			vector_insert(adjs, count_adjs, vector_at(net->_routers_vec, i));
-			count_adjs++;
-		}
-	}
+Vector get_adjacents(Net net, Item item) {
+	return net->_routers_matrix[item->_id-1];
 }
 
-void net_add_art_point(Net net, int i, Item item) {
+void net_add_art_point(Net net, Item item) {
 	/* vector_add_at(net->_articulation_points, i, item); */
-	if (vector_at(net->_articulation_points,i) == NULL)
-		vector_set(net->_articulation_points,i, item);
+	if (!vector_contains(net->_articulation_points, item))
+		vector_push_back(net->_articulation_points, item);
 }
 
 int net_get_N_art_points(Net net) {
@@ -114,24 +111,35 @@ int net_count_subnets(Net net) {
 }
 
 Net net_create_remove_articulations(Net net) {
-	Net new_net = net_alloc(net->_n_routers - vector_size(net->_articulation_points));
 	int i, j, count_articulations = 0;
 
 	for (i = 0; i < net->_n_routers; i++) {
-		if (vector_at(net->_articulation_points, i) == NULL) {
-			/* not an articulation point, add normally */
-			int tmp = 0;
-			for (j = i; j < net->_n_routers; j++) { 
-				/* because it's undirected, we just need to add from the diagonal to the front reducing the time that is needed */
-				if (vector_at(net->_articulation_points, j) == NULL && net->_routers_matrix[net_get_value(net, i+1,j+1)] != DISCONNECT)
-					net_add_connection(new_net, i - count_articulations + 1, j - tmp - count_articulations + 1);
-				else if (vector_at(net->_articulation_points, j))
-					tmp++;
-			}
-		} else {
-			/* articulation point, just increment and ignore */
-			count_articulations++;
-		}
+		Vector adjs = net->_routers_matrix[i];
+		for (j = vector_size(adjs)-1; j >=0; j--) {
+			if (vector_contains(net->_articulation_points, vector_at(adjs,j)))
+				vector_remove(adjs,j);
+		}			
 	}
-	return new_net;
+
+	/*  Remove os pontos de articulação do vetor de vertices puxando-os para a esquerda */
+	/*  Elimina também o vetor de arestas desses vértices a remover e mete-os a null (SAFE) */
+	for (i = vector_size(net->_articulation_points)-1; i >= 0; i--) {
+		vector_remove(net->_routers_vec, vector_at(net->_articulation_points,i)->_id-1);
+		delete_vector(net->_routers_matrix[vector_at(net->_articulation_points,i)->_id-1],NULL);
+		net->_routers_matrix[vector_at(net->_articulation_points,i)->_id-1] = NULL;
+	}
+
+	/* Caso encontrar zonas a null no routers matrix vai puxar para a esquerda quando necessário para acederes por indice logo */
+	for (i = 0; i < net->_n_routers; i++)
+		if(net->_routers_matrix[i] == NULL)
+			for (j = i; j < net->_n_routers-1; j++)
+				net->_routers_matrix[j] = net->_routers_matrix[j+1];
+
+	/* Atualiza o numero de vertices reais */
+	net->_n_routers -= vector_size(net->_articulation_points);
+	
+	/* Redefine os ids dos vertices para tirar todos os vertices de corte */
+	for (i = 0; i < net->_n_routers; i++)
+		vector_at(net->_routers_vec,i)->_id = i+1;
+	return net;
 }

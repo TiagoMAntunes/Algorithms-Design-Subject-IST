@@ -41,12 +41,12 @@ int DFS_visit(Net net, Item u, int low[]) {
 	u->_d = time;
 	u->_color = GRAY;
     low[u->_id - 1] = time;
-	Vector adjs_vector = create_vector(u->_in);
+	Vector adjs_vector;
 	int i, children = 0;
 
-	get_adjacents(net, u, adjs_vector);		
+	adjs_vector = get_adjacents(net, u);		
 	int val = u->_id;
-	for (i = 0; i < u->_in; i++) {		
+	for (i = 0; i < vector_size(adjs_vector); i++) {		
 		Item v = vector_at(adjs_vector,i);
 		if (v->_color == WHITE) {
 			children++;
@@ -58,12 +58,12 @@ int DFS_visit(Net net, Item u, int low[]) {
 
 	        /*  u is not root and low of one of its children is more than u's */
 	        if (u->_pi != NIL && low[v->_id -1] >= u->_d) {
-	           	net_add_art_point(net, u->_id - 1, u);
+	           	net_add_art_point(net, u);
 	        }
         
             /*  u is root and has 2 or more children */
 	        if (u->_pi == NIL && children > 1) {
-	          	net_add_art_point(net, u->_id - 1, u);
+	          	net_add_art_point(net, u);
 	         }
 
 		} else if (v->_id != u->_pi) { /* if the vertex isn't where it came from */
@@ -74,7 +74,6 @@ int DFS_visit(Net net, Item u, int low[]) {
 	time++;
 	u->_f = time;
 
-    delete_vector(adjs_vector, NULL);
 	return val;
 }
 
@@ -145,7 +144,8 @@ int main() {
 
 	/* clean up */
     delete_net(net);
-	delete_net(new_net);
+	/*delete_net(new_net);
+	*/
 
 	return 0;
 }

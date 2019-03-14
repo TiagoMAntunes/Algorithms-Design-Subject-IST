@@ -71,6 +71,13 @@ void vector_set(Vector v, int index, Item val) {
     v->_item_array[index] = val;
 }
 
+void vector_remove(Vector v, int index) {
+    for (; index < vector_size(v)-1; index++)
+        v->_item_array[index] = v->_item_array[index+1];
+    v->_item_array[index] = NULL;
+    v->_num_elements--;
+}
+
 void delete_vector(Vector v, void (*f)()) {
     int i;
     if (f != NULL)
@@ -82,4 +89,12 @@ void delete_vector(Vector v, void (*f)()) {
 
 void vector_sort(Vector v, int (*key)()) {
     qsort(v->_item_array, v->_num_elements, sizeof(Item), key);
+}
+
+int vector_contains(Vector contains, Item item) {
+    int i;
+    for (i = 0; i < vector_size(contains); i++)
+        if (vector_at(contains,i) == item)
+            return 1;
+    return 0;
 }
