@@ -12,8 +12,8 @@
 int time;
 
 Net read_input() {
-
 	int N, M, i;
+
 	if (scanf("%d", &N) != 1) {
 		fprintf(stderr,"Error reading input.");
 	}
@@ -56,12 +56,12 @@ int DFS_visit(Net net, Item u, int low[]) {
 
             low[u->_id - 1] = MIN(low[u->_id - 1], low[v->_id - 1]);   
 
-	        // v is not root and low of one of its children is more that v's
+	        // u is not root and low of one of its children is more than u's
 	        if (u->_pi != NIL && low[v->_id -1] >= u->_d) {
 	           	net_add_art_point(net, u->_id - 1, u);
 	        }
         
-            // v is root and has 2 or more children
+            // u is root and has 2 or more children
 	        if (u->_pi == NIL && children > 1) {
 	          	net_add_art_point(net, u->_id - 1, u);
 	         }
@@ -101,9 +101,29 @@ Vector DFS(Net net) {
 	return subnets_maxs;
 }
 
+
+void print_results(Vector subnets_net, Net net, int biggest_size) {
+	//Number of subnets
+	printf("%d\n", vector_size(subnets_net));
+	
+	//Id's of subnets
+	vector_sort(subnets_net, item_id_sort);
+	for (int i = 0; i < vector_size(subnets_net); i++) {
+		printf("%d ", vector_at(subnets_net, i)->_id);
+	}
+	printf("\n");
+	delete_vector(subnets_net, delete_item);
+
+	//Number of points that are dangerous
+	printf("%d\n", net_get_N_art_points(net));
+
+	//Biggest size of sub net
+	printf("%d", biggest_size);
+}
+
+
 int main() {
 	Net net = read_input();
-	int i;
 
 	Vector subnets_net = DFS(net);
 
@@ -120,22 +140,7 @@ int main() {
 				biggest_size = (item->_f / 2) - item->_d + 1;
 	}
 
-	//Number of subnets
-	printf("%d\n", vector_size(subnets_net));
-	
-	//Id's of subnets
-	vector_sort(subnets_net, item_id_sort);
-	for (i = 0; i < vector_size(subnets_net); i++) {
-		printf("%d ", vector_at(subnets_net, i)->_id);
-	}
-	printf("\n");
-	delete_vector(subnets_net, delete_item);
-
-	//Number of points that are dangerous
-	printf("%d\n", net_get_N_art_points(net));
-
-	//Biggest size of sub net
-	printf("%d", biggest_size);
+	print_results(subnets_net, net, biggest_size);
 
 	//clean up
     delete_net(net);
