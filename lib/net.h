@@ -1,4 +1,3 @@
-//#include "list.h"
 #include "vector.h"
 
 #ifndef NET_H

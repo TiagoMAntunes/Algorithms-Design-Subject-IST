@@ -8,23 +8,23 @@ typedef struct vector_t {
     int _num_elements;
 } * Vector;
 
-//Constructor
-Vector create_vector(int n); //returns an empty vector with a base size;
+/* Constructor */
+Vector create_vector(int n); /* returns an empty vector with a base size; */
 
-//Accessors
-Item vector_at(Vector v, int i); //returns the value at that position
-int vector_size(Vector v); //returns the current number of elements inserted
-int vector_empty(Vector v); //evaluates if it's empty
-int vector_capacity(Vector v); //returns the current capacity of a vector
+/* Accessors */
+Item vector_at(Vector v, int i); /* returns the value at that position */
+int vector_size(Vector v); /* returns the current number of elements inserted */
+int vector_empty(Vector v); /* evaluates if it's empty */
+int vector_capacity(Vector v); /* returns the current capacity of a vector */
 
-//Modifiers
-void vector_push_back(Vector v, Item val); //inserts at the end the value val
-Item vector_pop(Vector v); //removes and returns the last element
-void vector_insert(Vector v, int index, Item val); //inserts a value in an index
+/* Modifiers */
+void vector_push_back(Vector v, Item val); /* inserts at the end the value val */
+Item vector_pop(Vector v); /* removes and returns the last element */
+void vector_insert(Vector v, int index, Item val); /* inserts a value in an index */
 void vector_add_at(Vector v, int index, Item val);
 void vector_set(Vector v, int indeex, Item val);
 void vector_sort(Vector v, int (*key)());
-//Deconstructor
+/* Deconstructor */
 void delete_vector(Vector v, void (*item_free_function)());
 Item* vector_get_items(Vector v);
 

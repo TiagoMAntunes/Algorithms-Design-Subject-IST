@@ -6,14 +6,15 @@ Vector create_vector(int n) {
     v->_capacity = n;
     v->_num_elements = 0;
     v->_item_array = calloc(v->_capacity,sizeof(Item));
-    for (int i = 0; i < n; i++)
+    int i;
+    for (i = 0; i < n; i++)
         v->_item_array[i] = NULL;
     return v;
 }
 
 Item vector_at(Vector v, int i) {
     
-    return i < v->_capacity ? v->_item_array[i] : NULL; //if out of index, returns null
+    return i < v->_capacity ? v->_item_array[i] : NULL; /* if out of index, returns null */
 }
 
 int vector_size(Vector v) {
@@ -48,8 +49,9 @@ Item vector_pop(Vector v) {
 }
 
 void vector_insert(Vector v, int index, Item val) {
-    for (int j = v->_capacity-1; j > index; j--)
-        v->_item_array[j] = v->_item_array[j-1]; //shifts all to the right
+    int j;
+    for (j = v->_capacity-1; j > index; j--)
+        v->_item_array[j] = v->_item_array[j-1]; /* shifts all to the right */
     v->_item_array[index] = val;
     v->_num_elements++;
     vector_validate_size(v);
@@ -70,8 +72,9 @@ void vector_set(Vector v, int index, Item val) {
 }
 
 void delete_vector(Vector v, void (*f)()) {
+    int i;
     if (f != NULL)
-        for (int i = 0; i < v->_num_elements; i++)
+        for (i = 0; i < v->_num_elements; i++)
             f(vector_at(v, i));
     free(v->_item_array);
     free(v);
