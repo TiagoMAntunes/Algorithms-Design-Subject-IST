@@ -8,7 +8,8 @@
 #define NIL		-1
 #define CONNECTED	1
 #define MIN(A, B) ((A) < (B) ? (A) : (B))
-
+#define JUSTDOIT 1
+#define DONTDOIT 0
 int time;
 
 Net read_input() {
@@ -36,7 +37,7 @@ Net read_input() {
 	return net;
 }
 
-int DFS_visit(Net net, Item u, int low[]) {
+int DFS_visit(Net net, Item u, int low[], int do_it) {
 	time++;
 	u->_d = time;
 	u->_color = GRAY;
@@ -51,18 +52,18 @@ int DFS_visit(Net net, Item u, int low[]) {
 		if (v->_color == WHITE) {
 			children++;
 			v->_pi = u->_id;
-			int tmp = DFS_visit(net, v, low);
+			int tmp = DFS_visit(net, v, low, do_it);
 			if (tmp > val) val = tmp;
 
             low[u->_id - 1] = MIN(low[u->_id - 1], low[v->_id - 1]);   
 
 	        /*  u is not root and low of one of its children is more than u's */
-	        if (u->_pi != NIL && low[v->_id -1] >= u->_d) {
+	        if (do_it && u->_pi != NIL && low[v->_id -1] >= u->_d) {
 	           	net_add_art_point(net, u);
 	        }
         
             /*  u is root and has 2 or more children */
-	        if (u->_pi == NIL && children > 1) {
+	        if (do_it && u->_pi == NIL && children > 1) {
 	          	net_add_art_point(net, u);
 	         }
 
@@ -79,7 +80,7 @@ int DFS_visit(Net net, Item u, int low[]) {
 
 
 
-Vector DFS(Net net) {
+Vector DFS(Net net, int do_it) {
 	int i, N = net->_n_routers;
 	Item* items = net->_routers_vec->_item_array;
     int * low = calloc(sizeof(int),N);
@@ -94,7 +95,7 @@ Vector DFS(Net net) {
 	time = 0;
 	for (i = 0; i < N; i++) {		
 		if (items[i]->_color == WHITE)
-			vector_push_back(subnets_maxs, create_item(DFS_visit(net, items[i], low)));
+			vector_push_back(subnets_maxs, create_item(DFS_visit(net, items[i], low, do_it)));
 	}
 	free(low);
 	return subnets_maxs;
@@ -115,39 +116,28 @@ void print_results(Vector subnets_net, Net net, int biggest_size) {
 
 	/* Number of points that are dangerous */
 	printf("%d\n", net_get_N_art_points(net));
-
 	/* Biggest size of sub net */
 	printf("%d", biggest_size);
 }
 
 
 int main() {
+	int i, biggest_size = 0;
 	Net net = read_input();   
-
-	Vector subnets_net = DFS(net);
-	int z;
-	printf("Subnets: ");
-	for (z = 0; z < vector_size(subnets_net); z++)
-		printf("%d ", vector_at(subnets_net, z)->_id);
-	printf("\n");
+	Vector subnets_net = DFS(net,JUSTDOIT);
+	printf("First DFS done\n");
 	/*  build new net without the ap's and do the DFS */
 	Net new_net = net_create_remove_articulations(net);
-
-	printf("Subnets: ");
-	for (z = 0; z < vector_size(subnets_net); z++)
-		printf("%d ", vector_at(subnets_net, z)->_id);
-	printf("\n");
-
-
-	delete_vector(DFS(new_net), delete_item);
-	int i, biggest_size = 0;
+	printf("Updated graph\n");
+	delete_vector(DFS(new_net,DONTDOIT), delete_item);
+	printf("Second DFS done\n");
 	for (i = 0; i < new_net->_n_routers; i++) {		
 		Item item = vector_at(new_net->_routers_vec,i);
 		if (item->_pi == NIL)
 			if ((item->_f / 2) - item->_d + 1 > biggest_size)
 				biggest_size = (item->_f / 2) - item->_d + 1;
 	}
-
+	printf("Found the data needed\n");
 	print_results(subnets_net, net, biggest_size);
 
 	/* clean up */
