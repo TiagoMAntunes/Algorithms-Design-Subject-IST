@@ -105,7 +105,6 @@ void print_results(Vector subnets_net, Net net, int biggest_size) {
 	int i;
 	/* Number of subnets */
 	printf("%d\n", vector_size(subnets_net));
-	
 	/* Id's of subnets */
 	vector_sort(subnets_net, item_id_sort);
 	for (i = 0; i < vector_size(subnets_net); i++) {
@@ -126,9 +125,18 @@ int main() {
 	Net net = read_input();   
 
 	Vector subnets_net = DFS(net);
-
+	int z;
+	printf("Subnets: ");
+	for (z = 0; z < vector_size(subnets_net); z++)
+		printf("%d ", vector_at(subnets_net, z)->_id);
+	printf("\n");
 	/*  build new net without the ap's and do the DFS */
 	Net new_net = net_create_remove_articulations(net);
+
+	printf("Subnets: ");
+	for (z = 0; z < vector_size(subnets_net); z++)
+		printf("%d ", vector_at(subnets_net, z)->_id);
+	printf("\n");
 
 
 	delete_vector(DFS(new_net), delete_item);

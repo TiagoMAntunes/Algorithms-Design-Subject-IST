@@ -1,5 +1,6 @@
 #include "vector.h"
 #include <stdlib.h>
+#include <stdio.h>
 
 Vector create_vector(int n) {
     Vector v = malloc(sizeof(struct vector_t));

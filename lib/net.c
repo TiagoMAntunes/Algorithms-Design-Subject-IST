@@ -123,7 +123,7 @@ Net net_create_remove_articulations(Net net) {
 		}			
 	}
 
-	vector_sort(net->_articulation_points, item_id_sort);
+	vector_sort(net->_articulation_points, item_id_sort); /* Sort all the articulation points to remove from the end */
 
 	/*  Remove os pontos de articulação do vetor de vertices puxando-os para a esquerda */
 	/*  Elimina também o vetor de arestas desses vértices a remover e mete-os a null (SAFE) */

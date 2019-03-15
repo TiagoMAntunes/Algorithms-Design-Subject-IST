@@ -25,11 +25,8 @@ void add_out(Item i) {
 	i->_out++;
 }
 
-int item_id_sort(Item a, Item b) {
-    if (a->_id > b->_id)
-        return 1;
-    else if (a->_id == b->_id)
-        return 0;
-    else
-        return -1;
+int item_id_sort(void * voida, void * voidb) {
+    Item a = *((Item*) voida);
+    Item b = *((Item*) voidb);
+    return a->_id - b->_id;
 }
