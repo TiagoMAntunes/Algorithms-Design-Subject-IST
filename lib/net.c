@@ -71,6 +71,7 @@ void delete_net(Net n) {
 		delete_vector(n->_routers_matrix[i], NULL);
 	delete_vector(n->_routers_vec, delete_item);
 	free(n->_routers_matrix);
+	delete_vector(n->_articulation_points,delete_item);
 	free(n);
 }
 
@@ -111,15 +112,18 @@ int net_count_subnets(Net net) {
 }
 
 Net net_create_remove_articulations(Net net) {
-	int i, j, count_articulations = 0;
+	int i, j;
 
 	for (i = 0; i < net->_n_routers; i++) {
 		Vector adjs = net->_routers_matrix[i];
 		for (j = vector_size(adjs)-1; j >=0; j--) {
-			if (vector_contains(net->_articulation_points, vector_at(adjs,j)))
+			if (vector_contains(net->_articulation_points, vector_at(adjs,j))){
 				vector_remove(adjs,j);
+			}
 		}			
 	}
+
+	vector_sort(net->_articulation_points, item_id_sort);
 
 	/*  Remove os pontos de articulação do vetor de vertices puxando-os para a esquerda */
 	/*  Elimina também o vetor de arestas desses vértices a remover e mete-os a null (SAFE) */
@@ -131,9 +135,10 @@ Net net_create_remove_articulations(Net net) {
 
 	/* Caso encontrar zonas a null no routers matrix vai puxar para a esquerda quando necessário para acederes por indice logo */
 	for (i = 0; i < net->_n_routers; i++)
-		if(net->_routers_matrix[i] == NULL)
+		while(net->_routers_matrix[i] == NULL) /*pull back while there's a null -> inefficient*/
 			for (j = i; j < net->_n_routers-1; j++)
 				net->_routers_matrix[j] = net->_routers_matrix[j+1];
+			
 
 	/* Atualiza o numero de vertices reais */
 	net->_n_routers -= vector_size(net->_articulation_points);
