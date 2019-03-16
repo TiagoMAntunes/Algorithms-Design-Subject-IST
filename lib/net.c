@@ -66,9 +66,6 @@ void net_add_connection(Net net, int u, int v) {
 
 	list_insert(adj_list[u-1], new_v);
 	list_insert(adj_list[v-1], new_u);
-
-	add_in(vector_at(routers, u-1));
-	add_in(vector_at(routers, v-1));
 }
 
 

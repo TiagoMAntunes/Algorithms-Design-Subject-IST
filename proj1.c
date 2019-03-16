@@ -99,9 +99,12 @@ Vector DFS(Net net, int do_it) {
 
 	time = 0;
 	for (i = 0; i < N; i++) {		
-		if (items[i]->_color == WHITE) {
+		if (items[i]->_color == WHITE && do_it) {
 			vector_push_back(subnets_maxs, create_item(DFS_visit(net, items[i], low, do_it)));
+		} else if (items[i]->_color == WHITE){
+			DFS_visit(net, items[i], low, do_it);
 		}
+
 	}
 	free(low);
 	return subnets_maxs;
@@ -143,7 +146,7 @@ int main() {
 				biggest_size = (item->_f - item->_d) / 2 + 1;
 		}
 	}
-
+	
 	print_results(subnets_net, net, biggest_size);
 
 	/* clean up */

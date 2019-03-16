@@ -7,8 +7,9 @@ all:
 	cd lib && make
 	make proj1
 	cp proj1 tests/
+	cp proj1 student-tests/
 
-proj1: proj1.c lib/item.o lib/net.o
+proj1: proj1.c lib/item.o lib/net.o lib/list.o
 	$(CC) $(CFLAGS) $(wildcard lib/*.o) $< -o $(TARGET) $(LDFLAGS)
 
 prod:
