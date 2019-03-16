@@ -71,7 +71,7 @@ void delete_net(Net n) {
 		delete_vector(n->_routers_matrix[i], NULL);
 	delete_vector(n->_routers_vec, delete_item);
 	free(n->_routers_matrix);
-	delete_vector(n->_articulation_points,delete_item);
+	delete_vector(n->_articulation_points,NULL);
 	free(n);
 }
 
