@@ -7,7 +7,8 @@
 #define BLACK	2
 
 typedef struct item_t {
-    int _id, _in, _out, _color, _d, _f, _pi, _n_children;
+    int _id, _in, _out, _d, _f, _pi, _n_children;
+    short _color;
 } * Item;
 
 Item create_item(int id);

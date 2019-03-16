@@ -59,17 +59,11 @@ int DFS_visit(Net net, Item u, int low[], int do_it) {
 
             low[u->_id - 1] = MIN(low[u->_id - 1], low[v->_id - 1]);   
 
-	        /*  u is not root and low of one of its children is more than u's */
-	        if (do_it && u->_pi != NIL && low[v->_id -1] >= u->_d) {
+	        /*  u is not root and low of one of its children is more than u's or u is root and has 2 or more children */
+	        if (do_it && u->_color != YELLOW && ((u->_pi != NIL && low[v->_id -1] >= u->_d) || (u->_pi == NIL && children > 1))){
 	        	u->_color = YELLOW;
-	           	net_add_art_point(net, u);
+	           	net_add_art_point(net);
 	        }
-        
-            /*  u is root and has 2 or more children */
-	        if (do_it && u->_pi == NIL && children > 1) {
-	        	u->_color = YELLOW;
-	          	net_add_art_point(net, u);
-	         }
 
 		} else if (v->_id != u->_pi) { /* if the vertex isn't where it came from */
             low[u->_id -1] = MIN(low[u->_id - 1], v->_d);
