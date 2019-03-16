@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 
-Item get_item(Node n) {
+int get_item(Node n) {
     return n->item;
 }
 
@@ -12,7 +12,7 @@ Item get_item(Node n) {
  * createNode
  *******************************************************************************
 */
-Node list_create_node(Item i) {
+Node list_create_node(int i) {
     Node n = malloc(sizeof(struct node));
     n->item = i;
     n->next = NULL;

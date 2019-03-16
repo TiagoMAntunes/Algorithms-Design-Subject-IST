@@ -4,11 +4,11 @@
 #include "item.h"
 
 typedef struct node {
-    Item item;
+    int item;
     struct node * next;
 } * Node;
 
-Item get_item(Node n);
+int get_item(Node n);
 
 /*******************************************************************************
  * createNode
@@ -16,7 +16,7 @@ Item get_item(Node n);
  * Output: Pointer to node of list
  *******************************************************************************
 */
-Node list_create_node(Item i);
+Node list_create_node(int i);
 
 /******************************************************************************* 
  * freeNode
