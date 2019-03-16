@@ -11,6 +11,7 @@
 #define JUSTDOIT 1
 #define DONTDOIT 0
 #define YELLOW 	3
+#define MAX -9999
 int time;
 
 Net read_input() {
@@ -49,7 +50,7 @@ int DFS_visit(Net net, int id, int low[], int do_it, int *d, int *pi, short *col
 	adjs_vector = get_adjacents(net, id);		
 	int val = id;
 	Node h;
-	for (h = adjs_vector->next; h != NULL; h = h->next) {		
+	for (h = adjs_vector->next; h != NULL; h = h->next) {
 		
 		int next_id = get_item(h);
 
@@ -77,16 +78,15 @@ int DFS_visit(Net net, int id, int low[], int do_it, int *d, int *pi, short *col
 	}
 	time++;
 	if (pi[id-1] == NIL && colors[id-1] != YELLOW && (time - d[id-1]) / 2 + 1 > *biggest)
-				*biggest = (time - d[id-1]) / 2 + 1;
+		*biggest = (time - d[id-1]) / 2 + 1;
 	return val;
 }
 
+int counter = 0;
 
-
-Vector DFS(Net net, int do_it, int *d, int *pi, short * colors, int * biggest) {
+void DFS(Net net, int do_it, int *d, int *pi, short * colors, int * biggest) {
 	int i, N = net->_n_routers;
     int * low = calloc(sizeof(int),N);
-	Vector subnets_maxs = create_vector(1);
  
 	for (i = 0; i < N; i++) {	
 		if (do_it || (!do_it && colors[i] != YELLOW)) {	
@@ -98,40 +98,22 @@ Vector DFS(Net net, int do_it, int *d, int *pi, short * colors, int * biggest) {
 	}
 
 	time = 0;
-	for (i = 0; i < N; i++) {		
+	for (i = N-1; i > -1; i--) {		
 		if (colors[i] == WHITE && do_it) {
-			vector_push_back(subnets_maxs, DFS_visit(net, i+1, low, do_it, d, pi, colors, biggest));
+			int tmp = DFS_visit(net, i+1, low, do_it, d, pi, colors, biggest);
+			pi[tmp-1] = MAX;
+			counter++;
 		} else if (colors[i] == WHITE){
 			DFS_visit(net, i+1, low, do_it, d, pi, colors, biggest);
 		}
 	}
 	free(low);
-	return subnets_maxs;
 }
 
 int num_cmp(void * a, void * b) {
 	return *((int*)a) - *((int*)b);
 }
 
-void print_results(Vector subnets_net, Net net, int biggest_size) {
-	int i;
-	/* Number of subnets */
-	printf("%d\n", vector_size(subnets_net));
-	/* Id's of subnets */
-	vector_sort(subnets_net, num_cmp);
-	if (vector_size(subnets_net) > 0)
-		printf("%d", vector_at(subnets_net, 0));
-	for (i = 1; i < vector_size(subnets_net); i++) {
-		printf(" %d", vector_at(subnets_net, i));
-	}
-	printf("\n");
-	delete_vector(subnets_net);
-
-	/* Number of points that are dangerous */
-	printf("%d\n", net_get_N_art_points(net));
-	/* Biggest size of sub net */
-	printf("%d\n", biggest_size);
-}
 
 
 int main() {
@@ -140,16 +122,35 @@ int main() {
 	int *d = calloc(sizeof(int), net->_n_routers);
 	int *pi = calloc(sizeof(int), net->_n_routers);
 	short *colors = calloc(sizeof(short), net->_n_routers);
-	Vector subnets_net = DFS(net,JUSTDOIT, d, pi, colors, &biggest_size);
+	DFS(net,JUSTDOIT, d, pi, colors, &biggest_size);
 	biggest_size = 0;
-	delete_vector(DFS(net,DONTDOIT, d,pi, colors, &biggest_size));
+	
+
+	printf("%d\n", counter);
+	/* Id's of subnets */
+	int i=0;
+	if (counter > 0)
+		for (i = 0; (i < net->_n_routers) && (pi[i] != MAX); i++);
+	
+	printf("%d", ++i);
+	for (;i < net->_n_routers; i++) {
+		if (pi[i] == MAX)
+			printf(" %d", i+1);
+	}
+	printf("\n");
+
+	/* Number of points that are dangerous */
+	printf("%d\n", net_get_N_art_points(net));
+	
+	DFS(net,DONTDOIT, d,pi, colors, &biggest_size);
 	
 	free(d);
-	free(pi);
 	free(colors);
+	/* Biggest size of sub net */
+	printf("%d\n", biggest_size);
 	
-	print_results(subnets_net, net, biggest_size);
-
+	free(pi);
+	
 	/* clean up */
     delete_net(net);
 

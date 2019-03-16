@@ -31,6 +31,7 @@ void vector_validate_size(Vector v) {
     if (v->_num_elements == v->_capacity) {
         v->_item_array = realloc(v->_item_array, sizeof(int) * v->_capacity * 2);
         v->_capacity *= 2;
+        printf("New capacity: %d\n", v->_capacity);
     }
 }
 
