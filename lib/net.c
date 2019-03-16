@@ -1,5 +1,6 @@
 #include "net.h"
 #include "item.h"
+#include "list.h"
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -26,12 +27,12 @@ Net net_alloc(int n) {
 
 
 	/* Abstraction using list of adjacencies */
-	net->_routers_matrix = (Vector *) malloc(n * sizeof(Vector));
+	net->_routers_matrix = (Node *) malloc(n * sizeof(Node));
 	if (!net->_routers_matrix) {
 		fprintf(stderr, "Error with malloc allocating %d.", n*n);
 	}
 	for (i = 0; i < n; i++){
-		net->_routers_matrix[i] = create_vector(8);
+		net->_routers_matrix[i] = list_create_node(NULL);
 	}
 	return net;
 }
@@ -41,40 +42,51 @@ int get_validated_index(Net n, int u, int v) {
 	return n->_n_routers * u + v;
 }
 
-void net_update_value(Net n, int x, int y) {
+/*void net_update_value(Net n, int x, int y) {
 	vector_push_back(n->_routers_matrix[--x], vector_at(n->_routers_vec,--y));
 }
+*/
 
 int net_get_value(Net n, int x, int y) {
 	return DISCONNECT;
 }
 
 
+
 void net_add_connection(Net net, int u, int v) {
-	net_update_value(net, u, v);
-	net_update_value(net, v, u);
+	/*net_update_value(net, u, v);
+	net_update_value(net, v, u); */
 
 	Vector routers = net->_routers_vec;
 	/* u and v are the nodes' ids, hense the -1 */
+
+	Node* adj_list = net->_routers_matrix;
+	Node new_u = list_create_node(vector_at(routers, u-1));
+	Node new_v = list_create_node(vector_at(routers, v-1));
+
+	list_insert(adj_list[u-1], new_v);
+	list_insert(adj_list[v-1], new_u);
+
 	add_in(vector_at(routers, u-1));
 	add_in(vector_at(routers, v-1));
 }
 
-void net_remove_connection(Net net, int u, int v) {
+
+/*void net_remove_connection(Net net, int u, int v) {
 	net_update_value(net, u, v);
 	net_update_value(net, v, u);
-}
+}*/
 
 void delete_net(Net n) {
 	int i;
 	for (i = 0; i < n->_n_routers; i++)
-		delete_vector(n->_routers_matrix[i], NULL);
+		list_delete(n->_routers_matrix[i]);
 	delete_vector(n->_routers_vec, delete_item);
 	free(n->_routers_matrix);
 	free(n);
 }
 
-Vector get_adjacents(Net net, Item item) {
+Node get_adjacents(Net net, Item item) {
 	return net->_routers_matrix[item->_id-1];
 }
 

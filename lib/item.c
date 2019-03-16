@@ -30,3 +30,7 @@ int item_id_sort(void * voida, void * voidb) {
     Item b = *((Item*) voidb);
     return a->_id - b->_id;
 }
+
+int get_id(Item i) {
+    return i->_id;
+}

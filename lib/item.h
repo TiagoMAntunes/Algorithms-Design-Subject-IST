@@ -16,4 +16,5 @@ void delete_item(Item i);
 void add_in(Item i);
 void add_out(Item i);
 int item_id_sort(void* a, void* b);
+int get_id(Item i);
 #endif

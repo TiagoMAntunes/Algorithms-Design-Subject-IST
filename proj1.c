@@ -43,13 +43,14 @@ int DFS_visit(Net net, Item u, int low[], int do_it) {
 	u->_d = time;
 	u->_color = GRAY;
     low[u->_id - 1] = time;
-	Vector adjs_vector;
-	int i, children = 0;
+	Node adjs_vector;
+	int children = 0;
 
 	adjs_vector = get_adjacents(net, u);		
 	int val = u->_id;
-	for (i = 0; i < vector_size(adjs_vector); i++) {		
-		Item v = vector_at(adjs_vector,i);
+	Node h;
+	for (h = adjs_vector->next; h != NULL; h = h->next) {		
+		Item v = get_item(h);
 
 		if (v->_color == WHITE) {
 			children++;
@@ -132,26 +133,21 @@ int main() {
 	int i, biggest_size = 0;
 	Net net = read_input();   
 	Vector subnets_net = DFS(net,JUSTDOIT);
-	/*printf("First DFS done\n");*/
-	/*  build new net without the ap's and do the DFS */
-	/*Net new_net = net_create_remove_articulations(net);
-	printf("Updated graph\n");*/
-
+	
 	delete_vector(DFS(net,DONTDOIT), delete_item);
-	/*printf("Second DFS done\n");*/
+
 	for (i = 0; i < net->_n_routers; i++) {		
 		Item item = vector_at(net->_routers_vec,i);
 		if (item->_pi == NIL && item->_color != YELLOW){
 			if ((item->_f - item->_d) / 2 + 1 > biggest_size)
 				biggest_size = (item->_f - item->_d) / 2 + 1;
-	}}
-	/*printf("Found the data needed\n");*/
+		}
+	}
+
 	print_results(subnets_net, net, biggest_size);
 
 	/* clean up */
     delete_net(net);
-	/*delete_net(new_net);
-	*/
 
 	return 0;
 }

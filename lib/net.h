@@ -1,11 +1,12 @@
 #include "vector.h"
+#include "list.h"
 
 #ifndef NET_H
 #define NET_H
 typedef struct net {
 	int _n_routers;
 	Vector _routers_vec;
-	Vector * _routers_matrix;
+	Node * _routers_matrix;
 	int _articulation_points;
 } * Net;
 
@@ -16,8 +17,9 @@ void net_update_value(Net n, int x, int y);
 void net_add_connection(Net net, int u, int v);
 void net_remove_connection(Net net, int u, int v);
 void delete_net(Net n);
-Vector get_adjacents(Net net, Item item);
+Node get_adjacents(Net net, Item item);
 void net_add_art_point(Net net);
 int net_get_N_art_points(Net net);
 int net_count_subnets(Net net);
+
 #endif
