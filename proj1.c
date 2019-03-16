@@ -38,9 +38,9 @@ Net read_input() {
 	return net;
 }
 
-int DFS_visit(Net net, Item u, int low[], int do_it) {
+int DFS_visit(Net net, Item u, int low[], int do_it, int *d, int *f) {
 	time++;
-	u->_d = time;
+	d[u->_id-1] = time;
 	u->_color = GRAY;
     low[u->_id - 1] = time;
 	Node adjs_vector;
@@ -55,19 +55,19 @@ int DFS_visit(Net net, Item u, int low[], int do_it) {
 		if (v->_color == WHITE) {
 			children++;
 			v->_pi = u->_id;
-			int tmp = DFS_visit(net, v, low, do_it);
+			int tmp = DFS_visit(net, v, low, do_it, d, f);
 			if (tmp > val) val = tmp;
 
             low[u->_id - 1] = MIN(low[u->_id - 1], low[v->_id - 1]);   
 
 	        /*  u is not root and low of one of its children is more than u's or u is root and has 2 or more children */
-	        if (do_it && u->_color != YELLOW && ((u->_pi != NIL && low[v->_id -1] >= u->_d) || (u->_pi == NIL && children > 1))){
+	        if (do_it && u->_color != YELLOW && ((u->_pi != NIL && low[v->_id -1] >= d[u->_id -1]) || (u->_pi == NIL && children > 1))){
 	        	u->_color = YELLOW;
 	           	net_add_art_point(net);
 	        }
 
 		} else if (v->_id != u->_pi) { /* if the vertex isn't where it came from */
-            low[u->_id -1] = MIN(low[u->_id - 1], v->_d);
+            low[u->_id -1] = MIN(low[u->_id - 1], d[v->_id -1]);
         }
 
 	}
@@ -75,14 +75,14 @@ int DFS_visit(Net net, Item u, int low[], int do_it) {
 		u->_color = BLACK;
 	}
 	time++;
-	u->_f = time;
+	f[u->_id -1] = time;
 
 	return val;
 }
 
 
 
-Vector DFS(Net net, int do_it) {
+Vector DFS(Net net, int do_it, int *d, int *f) {
 	int i, N = net->_n_routers;
 	Item* items = net->_routers_vec->_item_array;
     int * low = calloc(sizeof(int),N);
@@ -93,6 +93,8 @@ Vector DFS(Net net, int do_it) {
 			items[i]->_color = WHITE;
 		}
 
+		d[i] = NIL;
+		f[i] = NIL; 
 		items[i]->_pi = NIL;
 		low[i] = NIL;
 	}
@@ -100,9 +102,9 @@ Vector DFS(Net net, int do_it) {
 	time = 0;
 	for (i = 0; i < N; i++) {		
 		if (items[i]->_color == WHITE && do_it) {
-			vector_push_back(subnets_maxs, create_item(DFS_visit(net, items[i], low, do_it)));
+			vector_push_back(subnets_maxs, create_item(DFS_visit(net, items[i], low, do_it, d, f)));
 		} else if (items[i]->_color == WHITE){
-			DFS_visit(net, items[i], low, do_it);
+			DFS_visit(net, items[i], low, do_it, d, f);
 		}
 
 	}
@@ -135,17 +137,22 @@ void print_results(Vector subnets_net, Net net, int biggest_size) {
 int main() {
 	int i, biggest_size = 0;
 	Net net = read_input();   
-	Vector subnets_net = DFS(net,JUSTDOIT);
+	int *d = calloc(sizeof(int), net->_n_routers);
+	int *f = calloc(sizeof(int), net->_n_routers);
+	Vector subnets_net = DFS(net,JUSTDOIT, d, f);
 	
-	delete_vector(DFS(net,DONTDOIT), delete_item);
+	
+	delete_vector(DFS(net,DONTDOIT, d, f), delete_item);
 
 	for (i = 0; i < net->_n_routers; i++) {		
 		Item item = vector_at(net->_routers_vec,i);
 		if (item->_pi == NIL && item->_color != YELLOW){
-			if ((item->_f - item->_d) / 2 + 1 > biggest_size)
-				biggest_size = (item->_f - item->_d) / 2 + 1;
+			if ((f[item->_id -1] - d[item->_id -1]) / 2 + 1 > biggest_size)
+				biggest_size = (f[item->_id -1] - d[item->_id -1]) / 2 + 1;
 		}
 	}
+	free(d);
+	free(f);
 	
 	print_results(subnets_net, net, biggest_size);
 
