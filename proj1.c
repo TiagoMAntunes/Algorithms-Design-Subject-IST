@@ -11,7 +11,7 @@
 #define JUSTDOIT 1
 #define DONTDOIT 0
 #define YELLOW 	3
-#define MAX -9999
+#define MAX -2
 int time;
 
 Net read_input() {
@@ -39,7 +39,7 @@ Net read_input() {
 	return net;
 }
 
-int DFS_visit(Net net, int id, int low[], int do_it, int *d, int *pi, short *colors, int *biggest) {
+int DFS_visit(Net net, int id, int low[], int do_it, int *d, int *pi, char *colors, int *biggest) {
 	time++;
 	d[id-1] = time;
 	colors[id - 1] = GRAY;
@@ -84,9 +84,9 @@ int DFS_visit(Net net, int id, int low[], int do_it, int *d, int *pi, short *col
 
 int counter = 0;
 
-void DFS(Net net, int do_it, int *d, int *pi, short * colors, int * biggest) {
+void DFS(Net net, int do_it, int *d, int *pi, char * colors, int * biggest) {
 	int i, N = net->_n_routers;
-    int * low = calloc(sizeof(int),N);
+    int low[N];
  
 	for (i = 0; i < N; i++) {	
 		if (do_it || (!do_it && colors[i] != YELLOW)) {	
@@ -107,7 +107,6 @@ void DFS(Net net, int do_it, int *d, int *pi, short * colors, int * biggest) {
 			DFS_visit(net, i+1, low, do_it, d, pi, colors, biggest);
 		}
 	}
-	free(low);
 }
 
 int num_cmp(void * a, void * b) {
@@ -119,9 +118,9 @@ int num_cmp(void * a, void * b) {
 int main() {
 	int biggest_size = 0;
 	Net net = read_input();   
-	int *d = calloc(sizeof(int), net->_n_routers);
-	int *pi = calloc(sizeof(int), net->_n_routers);
-	short *colors = calloc(sizeof(short), net->_n_routers);
+	int d[net->_n_routers];
+	int pi[net->_n_routers];
+	char colors[net->_n_routers];
 	DFS(net,JUSTDOIT, d, pi, colors, &biggest_size);
 	biggest_size = 0;
 	
@@ -144,12 +143,10 @@ int main() {
 	
 	DFS(net,DONTDOIT, d,pi, colors, &biggest_size);
 	
-	free(d);
-	free(colors);
+	
 	/* Biggest size of sub net */
 	printf("%d\n", biggest_size);
 	
-	free(pi);
 	
 	/* clean up */
     delete_net(net);
