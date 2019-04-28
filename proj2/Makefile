@@ -5,5 +5,8 @@ CC=g++
 
 all: $(TARGET)
 
-$(TARGET):
+$(TARGET): $(SOURCE)
 	$(CC) $(SOURCE) $(FLAGS) -o $(TARGET)
+
+clean:
+	rm $(TARGET)
