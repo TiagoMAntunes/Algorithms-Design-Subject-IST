@@ -7,6 +7,7 @@ all: $(TARGET)
 
 $(TARGET): $(SOURCE)
 	$(CC) $(SOURCE) $(FLAGS) -o $(TARGET)
+	cp $(TARGET) tests/
 
 clean:
 	rm $(TARGET)

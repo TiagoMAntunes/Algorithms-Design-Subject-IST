@@ -1,1 +1,4 @@
 .vscode/
+tests/*.try
+tests/proj
+proj
