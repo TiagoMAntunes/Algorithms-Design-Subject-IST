@@ -2,6 +2,7 @@
 #include <forward_list>
 #define SOURCE 0
 #define TARGET 1
+#define MIN(A,B) ((A) < (B) ? (A) : (B))
 
 class Edge{
         int _weight;
@@ -58,6 +59,10 @@ int main() {
         edges[validateIndex(o)].push_front(new Edge(c,d));
     }
 
+    for (int i = 0; i < 2 + f + e * 2; i++) {
+        for (auto edge : edges[i])
+            delete edge;
+    }
     delete[] edges;
     return 0;
 }
