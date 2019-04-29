@@ -1,6 +1,7 @@
 #include <iostream>
-
-#define SOURCE 1
+#include <forward_list>
+#define SOURCE 0
+#define TARGET 1
 
 class Edge{
         int _weight;
@@ -8,37 +9,51 @@ class Edge{
     public:
         int getWeight() { return _weight; }
         int getTarget() { return _target; }
-        int setWeight(int weight) { _weight = weight; }
-        int setTarget(int target) { _target = target; }
+        Edge(int w, int t);
 };
 
-int f, e, t;
+Edge::Edge(int w, int t) {
+    _weight = w;
+    _target = t;
+}
 
-int transformID(int id) {
-    if (id >= 2 && id <= f + 1) {
-        //do some logic
-    } else if (id > f + 1) {
-        //do some logic
-    }
+int f, e;
+
+int validateIndex(int id) {
+    if (id > f+1)
+        id += e;
+    return id;
 }
 
 int main() {
     //parse input
     int prod;
     int cap;
+    int t;
     int o, d, c;
+    int counter;
     std::cin >> f >> e >> t;
 
-    Edge * edges = new Edge[2 + f * 2 + e * 2]; //source + target + 2 * suppliers + 2 * stations
-
-    while (f-- > 0)
+    std::forward_list<Edge *> * edges = new std::forward_list<Edge *>[2 + f + e * 2]; //source + target + suppliers + 2 * stations
+    //source is 0
+    //target is 1
+    int index = 2;
+    counter = f;
+    while (counter-- > 0){
         std::cin >> prod;
-        
-    while (e-- > 0)
+        edges[SOURCE].push_front(new Edge(prod, index++));
+    }
+    counter = e;
+    while (counter-- > 0) {
         std::cin >> cap;
+        edges[index].push_front(new Edge(cap,index + e));
+        index++;
+    }
 
-    while (t-- > 0) 
+    while (t-- > 0) {
         std::cin >> o >> d >> c;
+        edges[validateIndex(o)].push_front(new Edge(c,d));
+    }
 
     delete[] edges;
     return 0;
