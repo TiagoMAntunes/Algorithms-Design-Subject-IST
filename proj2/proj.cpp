@@ -1,27 +1,37 @@
 #include <iostream>
 
+class Edge{
+        int _weight;
+        int _target;
+    public:
+        Edge(int weight, int target);
+        int getWeight() { return _weight; }
+        int getTarget() { return _target; }
+};
+
+Edge::Edge(int weight, int target) {
+    _weight = weight;
+    _target = target;
+}
+
 int main() {
     //parse input
     int f, e, t;    
+    int prod;
+    int cap;
+    int o, d, c;
     std::cin >> f >> e >> t;
     
-    while (f-- > 0) {
-        int prod;
+    while (f-- > 0)
         std::cin >> prod;
-        std::cout << prod << " ";
-    }
-    std::cout << std::endl;
-    while (e-- > 0) {
-        int cap;
+        
+    while (e-- > 0)
         std::cin >> cap;
-        std::cout << cap << " ";
-    }
-    std::cout << std::endl;
-    while (t-- > 0) {
-        int o, d, c;
+
+    while (t-- > 0) 
         std::cin >> o >> d >> c;
-        std::cout << o << " " << d << " " << c << " ";
-    std::cout << std::endl;
-    }
+
+
+
     return 0;
 }
