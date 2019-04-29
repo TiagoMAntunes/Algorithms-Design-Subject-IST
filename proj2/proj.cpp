@@ -6,15 +6,18 @@
 class Edge{
         int _weight;
         int _target;
+        int _flux;
     public:
         int getWeight() { return _weight; }
         int getTarget() { return _target; }
+        int getFlux() { return _flux; }
         Edge(int w, int t);
 };
 
 Edge::Edge(int w, int t) {
     _weight = w;
     _target = t;
+    _flux = 0;
 }
 
 int f, e;
