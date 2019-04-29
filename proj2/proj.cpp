@@ -81,7 +81,7 @@ void discharge(int u, int * overflows, int * heights, std::forward_list<Edge*>& 
 void relabel_to_front(std::forward_list<Edge *>* edges, int max, int * overflows, int * heights) {
     initialize_pre_flow(max, overflows, heights, edges);
     std::forward_list<int> * L = new std::forward_list<int>(max - 2);
-    for (int i = max; i > 1; i--) L->push_front(i);
+    for (int i = max-1; i > 1; i--) L->push_front(i);
     std::forward_list<int>::iterator it = L->begin();
     int u;
     while(it != L->end()) {
