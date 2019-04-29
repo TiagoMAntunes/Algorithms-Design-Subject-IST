@@ -58,12 +58,12 @@ void initialize_pre_flow(int max, int * overflows, int * heights, std::forward_l
         for (auto edge : edges_list[i])
             edge->setFlux(0);
     
-    heights[0] = max;
+    heights[TARGET] = max;
 
-    for (auto edge : edges_list[0]) {
+    for (auto edge : edges_list[TARGET]) {
         edge->setFlux(edge->getCapacity());
         overflows[edge->getTarget()] = edge->getCapacity();
-        overflows[0] -= edge->getCapacity();
+        overflows[TARGET] -= edge->getCapacity();
     }
 }
 
@@ -80,19 +80,32 @@ void discharge(int u, int * overflows, int * heights, std::forward_list<Edge*>& 
 
 void relabel_to_front(std::forward_list<Edge *>* edges, int max, int * overflows, int * heights) {
     initialize_pre_flow(max, overflows, heights, edges);
-    std::forward_list<int> * L = new std::forward_list<int>(max - 2);
-    for (int i = max-1; i > 1; i--) L->push_front(i);
+/* DEBUG 
+    for (int i = 0; i < 2 + f + e * 2; i++) {
+        std::cout << "------------Analyzing PRE FLOW " << i  << std::endl;
+        for (auto edge : edges[i])
+            std::cout << i << " to " << edge->getTarget() << " flux=" << edge->getFlux() << " capacity=" << edge->getCapacity() << std::endl;
+    }
+*/
+    std::forward_list<int> * L = new std::forward_list<int>(max - 2); 
+    for (int i = 2; i < max; i++) L->push_front(i);
     std::forward_list<int>::iterator it = L->begin();
     int u;
-    while(it != L->end()) {
+    while(it != L->end() && overflows[TARGET] != -overflows[SOURCE]) {
         u = *it;
         int oldh = heights[u];
+
+      //  int e = overflows[u]; //==============
+
         discharge(u, overflows, heights, edges[u]);
         if (heights[u] > oldh) {
             L->remove(u);
             L->push_front(u);
             it = L->begin();
         }
+    /* DEBUG    
+        std::cout << "v = " << *it << ", oldh = " << oldh << ", h = " << heights[*it] << ", e[v] = " << e << std::endl;
+    */    
         it++;
     }
 }
@@ -136,12 +149,17 @@ int main() {
     relabel_to_front(edges, 2 + f + e * 2, overflows, heights);
 
     //just for debugging
-    /*
+    
     for (int i = 0; i < 2 + f + e * 2; i++) {
         std::cout << "------------Analyzing " << i  << std::endl;
         for (auto edge : edges[i])
             std::cout << i << " to " << edge->getTarget() << " flux=" << edge->getFlux() << " capacity=" << edge->getCapacity() << std::endl;
-    }*/
+    }
+
+    std::cout << "=== Analyzing Heights" << std::endl;
+    for (int i = 0; i < 2 + f + e * 2; i++) {
+        std::cout << "h[" << i << "] = " << heights[i] << std::endl;
+    }
 
     for (int i = 0; i < 2 + f + e * 2; i++) {
         for (auto edge : edges[i])
