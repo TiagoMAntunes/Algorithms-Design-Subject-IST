@@ -124,18 +124,22 @@ int main() {
     //target is 1
     int index = 2;
     counter = f;
+    int prodTotal = 0;
     while (counter-- > 0){
         std::cin >> prod;
         edges[SOURCE].push_front(new Edge(prod, index));
         edges[index].push_front(new Edge(prod, SOURCE));
         index++;
+        prodTotal += prod;
     }
     counter = e;
+    int capTotal = 0;
     while (counter-- > 0) {
         std::cin >> cap;
         edges[index].push_front(new Edge(cap,index + e));
         edges[index + e].push_front(new Edge(cap,index));
         index++;
+        capTotal += e;
     }
 
     while (t-- > 0) {
@@ -144,22 +148,59 @@ int main() {
         edges[d].push_front(new Edge(c,validate_index(o)));
     }
 
-    int * overflows = new int[2 +f + e*2];
-    int * heights = new int[2 +f + e*2];
-    relabel_to_front(edges, 2 + f + e * 2, overflows, heights);
+
+    int max = 2 + f + e * 2;
+    int * overflows = new int[max];
+    int * heights = new int[max];
+    relabel_to_front(edges, max, overflows, heights);
 
     //just for debugging
     
-    for (int i = 0; i < 2 + f + e * 2; i++) {
+    for (int i = 0; i < max; i++) {
         std::cout << "------------Analyzing " << i  << std::endl;
         for (auto edge : edges[i])
             std::cout << i << " to " << edge->getTarget() << " flux=" << edge->getFlux() << " capacity=" << edge->getCapacity() << std::endl;
     }
 
     std::cout << "=== Analyzing Heights" << std::endl;
-    for (int i = 0; i < 2 + f + e * 2; i++) {
+    for (int i = 0; i < max; i++) {
         std::cout << "h[" << i << "] = " << heights[i] << std::endl;
     }
+
+    std::cout << "=== Results ===" << std::endl;
+    std::cout << overflows[SOURCE] << std::endl;
+
+ /*   std::cout << "prodTotal = " << prodTotal << std::endl;
+    std::cout << "capTotal = " << capTotal << std::endl;
+    std::cout << "flux = " << overflows[SOURCE] << std::endl;
+*/
+    for (int i = 1; i < max; i++) {
+        int origin = i - e;
+        if (heights[i] >= max && i > f + 1 && origin > (f + 1) && heights[origin] < max) {
+            std::cout << "armazem = " << origin << std::endl;
+            int prodIn = 0;
+            for (auto edge : edges[origin]) {
+                if (edge->getTarget() <= 1 + f )
+                prodIn += edge->getCapacity();
+            }
+            std::cout << "prodIn = " << prodIn << std::endl;
+            int cap = 0;
+            for (auto edge : edges[i]) {
+                if (edge->getTarget() == origin) {
+                    cap += edge->getCapacity();
+                }
+            }
+            std::cout << "cap = " << cap << std::endl;
+
+            if (prodIn > cap) {
+                std::cout << "v = " << i << std::endl;
+                std::cout << i - e << " ";
+            }
+        }
+    }
+
+    std::cout << std::endl;
+
 
     for (int i = 0; i < 2 + f + e * 2; i++) {
         for (auto edge : edges[i])
