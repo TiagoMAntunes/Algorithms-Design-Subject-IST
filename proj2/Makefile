@@ -10,6 +10,7 @@ all: $(TARGET)
 $(TARGET): $(SOURCE)
 	$(CC) $(SOURCE) $(FLAGS) $(DEBUGFLAGS) -o $(TARGET)
 	cp $(TARGET) tests/
+	cp $(TARGET) student-tests/
 
 clean:
 	rm $(TARGET)

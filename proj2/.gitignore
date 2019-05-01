@@ -2,3 +2,5 @@
 tests/*.try
 tests/proj
 proj
+student-tests/proj
+student-tests/*.try
