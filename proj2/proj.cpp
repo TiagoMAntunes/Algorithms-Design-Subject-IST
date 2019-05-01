@@ -26,6 +26,7 @@ Edge::Edge(int w, int t) {
 }
 
 int f, e;
+std::forward_list<Edge *>::iterator * neighbors;
 
 int validate_index(int id) {
     if (id > f+1)
@@ -67,14 +68,20 @@ void initialize_pre_flow(int max, int * overflows, int * heights, std::forward_l
     }
 }
 
-void discharge(int u, int * overflows, int * heights, std::forward_list<Edge*>& edges) {
+void reset(int i, std::forward_list<Edge *> * edges ) {
+    neighbors[i] = edges[i].begin();
+}
+
+void discharge(int u, int * overflows, int * heights, std::forward_list<Edge*>* edges) {
     while (overflows[u] > 0){
-        for (auto edge : edges) {
-            if (edge->residualCapacity() > 0 && heights[u] == heights[edge->getTarget()] + 1)
-                push(u, edge->getTarget(), overflows, edge);
-        }
-        if (overflows[u] > 0)
-            relabel(u, edges, heights);
+        if (neighbors[u] == edges[u].end()) {
+            relabel(u, edges[u], heights);
+            reset(u, edges);
+        } else if ((*neighbors[u])->residualCapacity() > 0 && heights[u] == heights[(*neighbors[u])->getTarget()] + 1) 
+            push(u, (*neighbors[u])->getTarget(), overflows, *neighbors[u]);
+        else 
+            neighbors[u]++;
+
     }
 }
 
@@ -97,7 +104,7 @@ void relabel_to_front(std::forward_list<Edge *>* edges, int max, int * overflows
 
       //  int e = overflows[u]; //==============
 
-        discharge(u, overflows, heights, edges[u]);
+        discharge(u, overflows, heights, edges);
         if (heights[u] > oldh) {
             L->remove(u);
             L->push_front(u);
@@ -152,6 +159,9 @@ int main() {
     int max = 2 + f + e * 2;
     int * overflows = new int[max];
     int * heights = new int[max];
+    neighbors = new std::forward_list<Edge *>::iterator[max];
+    for (int i = 0; i < max; i++)
+        neighbors[i] = edges[i].begin();
     relabel_to_front(edges, max, overflows, heights);
 
     //just for debugging
