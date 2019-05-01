@@ -34,9 +34,14 @@ int validate_index(int id) {
     return id;
 }
 
-void push(int u, int v, int * overflows, Edge * edge) {
+void push(int u, int v, int * overflows, Edge * edge, std::forward_list<Edge *>& edges) {
     int available_flux = MIN(overflows[u], edge->residualCapacity());
     edge->increaseFlux(available_flux);
+    for (auto new_edge : edges) //update back edge
+        if (new_edge->getTarget() == u){
+            new_edge->setFlux(edge->getFlux());
+            break;
+        }    
     overflows[u] -= available_flux;
     overflows[v] += available_flux;
 }
@@ -44,7 +49,7 @@ void push(int u, int v, int * overflows, Edge * edge) {
 void relabel(int u, std::forward_list<Edge*>& edges, int * heights) {
     int min_height = std::numeric_limits<int>::max();
     for (auto t : edges)
-        if (t->residualCapacity() > 0 && heights[t->getTarget()] < min_height)
+        if (t->residualCapacity() > 0 && heights[t->getTarget()] <= min_height)
             min_height = heights[t->getTarget()];
     heights[u] = 1 + min_height;
 }
@@ -78,7 +83,7 @@ void discharge(int u, int * overflows, int * heights, std::forward_list<Edge*>* 
             relabel(u, edges[u], heights);
             reset(u, edges);
         } else if ((*neighbors[u])->residualCapacity() > 0 && heights[u] == heights[(*neighbors[u])->getTarget()] + 1) 
-            push(u, (*neighbors[u])->getTarget(), overflows, *neighbors[u]);
+            push(u, (*neighbors[u])->getTarget(), overflows, *neighbors[u], edges[(*neighbors[u])->getTarget()]);
         else 
             neighbors[u]++;
 
@@ -217,5 +222,5 @@ int main() {
             delete edge;
     }
     delete[] edges;
-    return 0;
+    return 0;  
 }
