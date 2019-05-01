@@ -39,7 +39,7 @@ void push(int u, int v, int * overflows, Edge * edge, std::forward_list<Edge *>&
     edge->increaseFlux(available_flux);
     for (auto new_edge : edges) //update back edge
         if (new_edge->getTarget() == u){
-            new_edge->setFlux(edge->getFlux());
+            new_edge->setFlux(-edge->getFlux());
             break;
         }    
     overflows[u] -= available_flux;
@@ -49,7 +49,7 @@ void push(int u, int v, int * overflows, Edge * edge, std::forward_list<Edge *>&
 void relabel(int u, std::forward_list<Edge*>& edges, int * heights) {
     int min_height = std::numeric_limits<int>::max();
     for (auto t : edges)
-        if (t->residualCapacity() > 0 && heights[t->getTarget()] <= min_height)
+        if (t->residualCapacity() > 0 && heights[t->getTarget()] < min_height)
             min_height = heights[t->getTarget()];
     heights[u] = 1 + min_height;
 }
@@ -70,6 +70,11 @@ void initialize_pre_flow(int max, int * overflows, int * heights, std::forward_l
         edge->setFlux(edge->getCapacity());
         overflows[edge->getTarget()] = edge->getCapacity();
         overflows[TARGET] -= edge->getCapacity();
+        for (auto new_edge : edges_list[edge->getTarget()])
+            if (new_edge->getTarget() == TARGET) {
+                new_edge->setFlux(-edge->getCapacity());
+                break;
+            }
     }
 }
 
