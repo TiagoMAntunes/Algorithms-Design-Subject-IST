@@ -213,13 +213,11 @@ int main() {
     for (int i = f + 2 + e; i < max; i++) {
         int origin = i - e;
         if (heights[i] >= max && heights[origin] < max) {
-            if (heights[i] >= max && heights[origin] < max) {
-                if (changed)
-                    std::cout << " ";
-                else
-                    changed = true;
-                std::cout << i - e;
-            }
+            if (changed)
+                std::cout << " ";
+            else
+                changed = true;
+            std::cout << i - e;
         }
     }
     int i;
