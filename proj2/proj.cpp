@@ -251,7 +251,7 @@ int main() {
 
     for (int i = 0; i < 2 + f + e * 2; i++) {
         for (auto edge : edges[i])
-            delete edge;
+            delete edge; 
     }
     delete[] edges;
     return 0;  
