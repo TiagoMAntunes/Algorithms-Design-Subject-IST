@@ -1,6 +1,7 @@
 #include <iostream>
 #include <forward_list>
 #include <limits>
+#include <queue>
 #define SOURCE 0
 #define TARGET 1
 #define MIN(A,B) ((A) < (B) ? (A) : (B))
@@ -9,20 +10,34 @@ class Edge{
         int _capacity;
         int _target;
         int _flux;
+        int _from;
     public:
         int getCapacity() { return _capacity; }
         int getTarget() { return _target; }
         int getFlux() { return _flux; }
+        int getOrigin() {return _from;}
         void setFlux(int v) { _flux = v; }
         void increaseFlux(int n) { _flux += n; }
         int residualCapacity() { return _capacity - _flux;}
-        Edge(int w, int t);
+        Edge(int s,int w, int t);
 };
 
-Edge::Edge(int w, int t) {
+bool operator<(Edge& lhs, Edge &rhs) {
+    return lhs.getOrigin() > rhs.getOrigin() || ( lhs.getOrigin() == rhs.getOrigin() && lhs.getTarget() > rhs.getTarget());
+}
+
+class Compare {
+    public:
+        bool operator() (Edge * a, Edge * b) {
+            return *a < *b;
+        }
+};
+
+Edge::Edge(int s,int w, int t) {
     _capacity = w;
     _target = t;
     _flux = 0;
+    _from = s;
 }
 
 int f, e;
@@ -144,8 +159,8 @@ int main() {
     int prodTotal = 0;
     while (counter-- > 0){
         std::cin >> prod;
-        edges[SOURCE].push_front(new Edge(prod, index));
-        edges[index].push_front(new Edge(prod, SOURCE));
+        edges[SOURCE].push_front(new Edge(SOURCE, prod, index));
+        edges[index].push_front(new Edge(index, prod, SOURCE));
         index++;
         prodTotal += prod;
     }
@@ -153,16 +168,16 @@ int main() {
     int capTotal = 0;
     while (counter-- > 0) {
         std::cin >> cap;
-        edges[index].push_front(new Edge(cap,index + e));
-        edges[index + e].push_front(new Edge(cap,index));
+        edges[index].push_front(new Edge(index,cap,index + e));
+        edges[index + e].push_front(new Edge(index + e,cap,index));
         index++;
         capTotal += e;
     }
 
     while (t-- > 0) {
         std::cin >> o >> d >> c;
-        edges[validate_index(o)].push_front(new Edge(c,d));
-        edges[d].push_front(new Edge(c,validate_index(o)));
+        edges[validate_index(o)].push_front(new Edge(validate_index(o),c,d));
+        edges[d].push_front(new Edge(d,c,validate_index(o)));
     }
 
 
@@ -194,7 +209,7 @@ int main() {
     std::cout << "capTotal = " << capTotal << std::endl;
     std::cout << "flux = " << overflows[SOURCE] << std::endl;
 */
-    bool changed = false;
+    bool changed = false; 
     for (int i = f + 2 + e; i < max; i++) {
         int origin = i - e;
         if (heights[i] >= max && heights[origin] < max) {
@@ -208,20 +223,31 @@ int main() {
         }
     }
     int i;
+    std::priority_queue<Edge *, std::vector<Edge*>, Compare> edges1;
     for (i = 2; i < f + 2; i++) {
         for (auto edge : edges[i])
-            if (heights[i] < max && heights[edge->getTarget()] >= max && edge->getTarget() != 0) {
-                std::cout << std::endl;
-                std::cout << i << " " << edge->getTarget();
-            }
+            if (heights[i] < max && heights[edge->getTarget()] >= max && edge->getTarget() != 0)
+                edges1.push(edge);
+    }
+
+    while (!edges1.empty()) {
+        Edge * edge = edges1.top();
+        std::cout << std::endl;
+        std::cout << edge->getOrigin() << " " << edge->getTarget();
+        edges1.pop();
     }
 
     for (i = f + 2 + e; i < max; i++) {
         for (auto edge : edges[i]) 
-            if (heights[i] < max && heights[edge->getTarget()] >= max) {
-                std::cout << std::endl;
-                std::cout << i - e << " " << edge->getTarget();
-            }
+            if (heights[i] < max && heights[edge->getTarget()] >= max)
+                edges1.push(edge);
+    }
+
+    while (!edges1.empty()) {
+        Edge * edge = edges1.top();
+        std::cout << std::endl;
+        std::cout << edge->getOrigin() - e << " " << edge->getTarget();
+        edges1.pop();
     }
     std::cout << std::endl;
 
