@@ -109,7 +109,7 @@ void reset(int i, std::forward_list<Edge *> * edges ) {
     neighbors[i] = edges[i].begin();
 }
 
-void discharge(int u, int * overflows, int * heights, std::forward_list<Edge*>* edges, std::priority_queue<int> &Q) {
+void discharge(int u, int * overflows, int * heights, std::forward_list<Edge*>* edges, std::queue<int> &Q) {
     while (overflows[u] > 0){
         if (neighbors[u] == edges[u].end()) {
             relabel(u, edges[u], heights);
@@ -133,11 +133,11 @@ void relabel_to_front(std::forward_list<Edge *>* edges, int max, int * overflows
             std::cout << i << " to " << edge->getTarget() << " flux=" << edge->getFlux() << " capacity=" << edge->getCapacity() << std::endl;
     }
 */
-    std::priority_queue<int, std::vector<int>>Q;
+    std::queue<int>Q;
     for (int i = 2; i < max; i++) Q.push(i);
     int u;
     while(!Q.empty() && overflows[TARGET] != -overflows[SOURCE]) {
-        u = Q.top();
+        u = Q.front();
         Q.pop();
 
       //  int e = overflows[u]; //==============
