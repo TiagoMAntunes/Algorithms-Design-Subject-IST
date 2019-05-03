@@ -116,7 +116,7 @@ void discharge(int u, int * overflows, int * heights, std::forward_list<Edge*>* 
             reset(u, edges);
         } else if ((*neighbors[u])->residualCapacity() > 0 && heights[u] == heights[(*neighbors[u])->getTarget()] + 1) {
             push(u, (*neighbors[u])->getTarget(), overflows, *neighbors[u], edges[(*neighbors[u])->getTarget()]);
-            Q.push((*neighbors[u])->getTarget());
+            if ((*neighbors[u])->getTarget() != 1 && (*neighbors[u])->getTarget() != 0) Q.push((*neighbors[u])->getTarget());
         }
         else 
             neighbors[u]++;
@@ -133,7 +133,7 @@ void relabel_to_front(std::forward_list<Edge *>* edges, int max, int * overflows
             std::cout << i << " to " << edge->getTarget() << " flux=" << edge->getFlux() << " capacity=" << edge->getCapacity() << std::endl;
     }
 */
-    std::priority_queue<int>Q;
+    std::priority_queue<int, std::vector<int>>Q;
     for (int i = 2; i < max; i++) Q.push(i);
     int u;
     while(!Q.empty() && overflows[TARGET] != -overflows[SOURCE]) {
