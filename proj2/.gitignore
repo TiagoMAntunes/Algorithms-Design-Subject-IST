@@ -4,3 +4,4 @@ tests/proj
 proj
 student-tests/proj
 student-tests/*.try
+gmon.out
