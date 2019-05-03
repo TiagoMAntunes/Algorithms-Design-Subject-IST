@@ -167,7 +167,7 @@ int main() {
     int o, d, c;
     int counter;
     std::cin >> f >> e >> t;
-
+    
     std::forward_list<Edge *> * edges = new std::forward_list<Edge *>[2 + f + e * 2]; //source + target + suppliers + 2 * stations
     //source is 0
     //target is 1
@@ -176,8 +176,8 @@ int main() {
     int prodTotal = 0;
     while (counter-- > 0){
         std::cin >> prod;
-        edges[SOURCE].push_front(new Edge(SOURCE, prod, index));
-        edges[index].push_front(new Edge(index, prod, SOURCE));
+        edges[SOURCE].push_front(new Edge(SOURCE, prod, index)); //edge from source to supplier
+        edges[index].push_front(new Edge(index, prod, SOURCE)); //reverse edge
         index++;
         prodTotal += prod;
     }
@@ -185,7 +185,7 @@ int main() {
     int capTotal = 0;
     while (counter-- > 0) {
         std::cin >> cap;
-        edges[index].push_front(new Edge(index,cap,index + e));
+        edges[index].push_front(new Edge(index,cap,index + e)); //set capacity of storage as 2 vertexes
         edges[index + e].push_front(new Edge(index + e,cap,index));
         index++;
         capTotal += e;
@@ -193,7 +193,7 @@ int main() {
 
     while (t-- > 0) {
         std::cin >> o >> d >> c;
-        edges[validate_index(o)].push_front(new Edge(validate_index(o),c,d));
+        edges[validate_index(o)].push_front(new Edge(validate_index(o),c,d)); //set edges inside graph while validating if origin is storage
         edges[d].push_front(new Edge(d,c,validate_index(o)));
     }
 
@@ -220,14 +220,10 @@ int main() {
     }
     */
     //std::cout << "=== Results ===" << std::endl;
-    std::cout << overflows[SOURCE] << std::endl;
+    std::cout << overflows[SOURCE] << std::endl; // the output
 
- /*   std::cout << "prodTotal = " << prodTotal << std::endl;
-    std::cout << "capTotal = " << capTotal << std::endl;
-    std::cout << "flux = " << overflows[SOURCE] << std::endl;
-*/
     bool changed = false; 
-    for (int i = f + 2 + e; i < max; i++) {
+    for (int i = f + 2 + e; i < max; i++) { // for each storage
         int origin = i - e;
         if (heights[i] >= max && heights[origin] < max) {
             if (changed)
@@ -239,9 +235,9 @@ int main() {
     }
     int i;
     std::priority_queue<Edge *, std::vector<Edge*>, Compare> edges1;
-    for (i = 2; i < f + 2; i++) {
+    for (i = 2; i < f + 2; i++) { //for each supplier
         for (auto edge : edges[i])
-            if (heights[i] < max && heights[edge->getTarget()] >= max && edge->getTarget() != 0)
+            if (heights[i] < max && heights[edge->getTarget()] >= max && edge->getTarget() != 0) //avoid back edges to source
                 edges1.push(edge);
     }
 
@@ -252,9 +248,9 @@ int main() {
         edges1.pop();
     }
 
-    for (i = f + 2 + e; i < max; i++) {
+    for (i = f + 2 + e; i < max; i++) { //for edges exiting storage
         for (auto edge : edges[i]) 
-            if (heights[i] < max && heights[edge->getTarget()] >= max)
+            if (heights[i] < max && heights[edge->getTarget()] >= max && i - edge->getTarget() != e) //avoid going back to storage
                 edges1.push(edge);
     }
 
