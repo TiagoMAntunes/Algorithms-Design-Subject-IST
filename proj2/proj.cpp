@@ -156,7 +156,7 @@ void DFS(std::forward_list<Edge *> *  edges, int * colors, int max) {
     for (int i = 0; i < max; i++)
         colors[i] = WHITE;
 
-    DFS_visit(TARGET, edges, colors);
+    DFS_visit(SOURCE, edges, colors);
 }
 
 int main() {
@@ -221,6 +221,10 @@ int main() {
     */
     //std::cout << "=== Results ===" << std::endl;
     std::cout << overflows[SOURCE] << std::endl; // the output
+    DFS(edges, overflows, max);
+    for (int i = 0; i < max; i++)
+        if(overflows[i] == BLACK)
+            std::cout << "Vertice: " << i << std::endl;
 
     bool changed = false; 
     for (int i = f + 2 + e; i < max; i++) { // for each storage
