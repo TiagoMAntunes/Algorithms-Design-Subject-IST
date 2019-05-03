@@ -4,4 +4,6 @@ tests/proj
 proj
 student-tests/proj
 student-tests/*.try
+tmp
 gmon.out
+output.png

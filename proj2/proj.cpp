@@ -109,13 +109,15 @@ void reset(int i, std::forward_list<Edge *> * edges ) {
     neighbors[i] = edges[i].begin();
 }
 
-void discharge(int u, int * overflows, int * heights, std::forward_list<Edge*>* edges) {
+void discharge(int u, int * overflows, int * heights, std::forward_list<Edge*>* edges, std::priority_queue<int> &Q) {
     while (overflows[u] > 0){
         if (neighbors[u] == edges[u].end()) {
             relabel(u, edges[u], heights);
             reset(u, edges);
-        } else if ((*neighbors[u])->residualCapacity() > 0 && heights[u] == heights[(*neighbors[u])->getTarget()] + 1) 
+        } else if ((*neighbors[u])->residualCapacity() > 0 && heights[u] == heights[(*neighbors[u])->getTarget()] + 1) {
             push(u, (*neighbors[u])->getTarget(), overflows, *neighbors[u], edges[(*neighbors[u])->getTarget()]);
+            Q.push((*neighbors[u])->getTarget());
+        }
         else 
             neighbors[u]++;
 
@@ -131,26 +133,20 @@ void relabel_to_front(std::forward_list<Edge *>* edges, int max, int * overflows
             std::cout << i << " to " << edge->getTarget() << " flux=" << edge->getFlux() << " capacity=" << edge->getCapacity() << std::endl;
     }
 */
-    std::forward_list<int> * L = new std::forward_list<int>(max - 2); 
-    for (int i = 2; i < max; i++) L->push_front(i);
-    std::forward_list<int>::iterator it = L->begin();
+    std::priority_queue<int>Q;
+    for (int i = 2; i < max; i++) Q.push(i);
     int u;
-    while(it != L->end() && overflows[TARGET] != -overflows[SOURCE]) {
-        u = *it;
-        int oldh = heights[u];
+    while(!Q.empty() && overflows[TARGET] != -overflows[SOURCE]) {
+        u = Q.top();
+        Q.pop();
 
       //  int e = overflows[u]; //==============
 
-        discharge(u, overflows, heights, edges);
-        if (heights[u] > oldh) {
-            L->remove(u);
-            L->push_front(u);
-            it = L->begin();
-        }
+        discharge(u, overflows, heights, edges, Q);
+        
     /* DEBUG    
         std::cout << "v = " << *it << ", oldh = " << oldh << ", h = " << heights[*it] << ", e[v] = " << e << std::endl;
     */    
-        it++;
     }
 }
 
