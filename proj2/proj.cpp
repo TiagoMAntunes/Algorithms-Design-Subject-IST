@@ -176,7 +176,7 @@ int main() {
     int prodTotal = 0;
     while (counter-- > 0){
         std::cin >> prod;
-        edges[SOURCE].push_front(new Edge(SOURCE, prod, index)); //edge from source to supplier
+        edges[SOURCE].push_front(new Edge(SOURCE, 0, index)); //edge from source to supplier
         edges[index].push_front(new Edge(index, prod, SOURCE)); //reverse edge
         index++;
         prodTotal += prod;
@@ -185,7 +185,7 @@ int main() {
     int capTotal = 0;
     while (counter-- > 0) {
         std::cin >> cap;
-        edges[index].push_front(new Edge(index,cap,index + e)); //set capacity of storage as 2 vertexes
+        edges[index].push_front(new Edge(index,0,index + e)); //set capacity of storage as 2 vertexes
         edges[index + e].push_front(new Edge(index + e,cap,index));
         index++;
         capTotal += e;
@@ -193,7 +193,7 @@ int main() {
 
     while (t-- > 0) {
         std::cin >> o >> d >> c;
-        edges[validate_index(o)].push_front(new Edge(validate_index(o),c,d)); //set edges inside graph while validating if origin is storage
+        edges[validate_index(o)].push_front(new Edge(validate_index(o),0,d)); //set edges inside graph while validating if origin is storage
         edges[d].push_front(new Edge(d,c,validate_index(o)));
     }
 
@@ -213,7 +213,7 @@ int main() {
         for (auto edge : edges[i])
             std::cout << i << " to " << edge->getTarget() << " flux=" << edge->getFlux() << " capacity=" << edge->getCapacity() << std::endl;
     }
-
+    
     std::cout << "=== Analyzing Heights" << std::endl;
     for (int i = 0; i < max; i++) {
         std::cout << "h[" << i << "] = " << heights[i] << std::endl;
@@ -222,10 +222,7 @@ int main() {
     //std::cout << "=== Results ===" << std::endl;
     std::cout << overflows[SOURCE] << std::endl; // the output
     DFS(edges, overflows, max);
-    for (int i = 0; i < max; i++)
-        if(overflows[i] == BLACK)
-            std::cout << "Vertice: " << i << std::endl;
-
+    
     bool changed = false; 
     for (int i = f + 2 + e; i < max; i++) { // for each storage
         int origin = i - e;
