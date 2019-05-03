@@ -13,6 +13,7 @@ class Edge{
         int _target;
         int _flux;
         int _from;
+        Edge * _rev;
     public:
         int getCapacity() { return _capacity; }
         int getTarget() { return _target; }
@@ -21,6 +22,8 @@ class Edge{
         void setFlux(int v) { _flux = v; }
         void increaseFlux(int n) { _flux += n; }
         int residualCapacity() { return _capacity - _flux;}
+        void setReverse(Edge * e) {_rev = e;}
+        Edge * getReverse() {return _rev;}
         Edge(int s,int w, int t);
 };
 
@@ -40,6 +43,7 @@ Edge::Edge(int s,int w, int t) {
     _target = t;
     _flux = 0;
     _from = s;
+    _rev = NULL;
 }
 
 int f, e;
@@ -54,11 +58,14 @@ int validate_index(int id) {
 void push(int u, int v, int * overflows, Edge * edge, std::forward_list<Edge *>& edges) {
     int available_flux = MIN(overflows[u], edge->residualCapacity());
     edge->increaseFlux(available_flux);
-    for (auto new_edge : edges) //update back edge
+    /*for (auto new_edge : edges) //update back edge
         if (new_edge->getTarget() == u){
             new_edge->setFlux(-edge->getFlux());
             break;
-        }    
+        }  
+    */
+    Edge * reverse = edge->getReverse();
+    reverse->setFlux(-edge->getFlux());  
     overflows[u] -= available_flux;
     overflows[v] += available_flux;
 }
@@ -77,21 +84,24 @@ void initialize_pre_flow(int max, int * overflows, int * heights, std::forward_l
         heights[i] = 0;
     }
 
-    for (int i = 0; i < max; i++)
+/*    for (int i = 0; i < max; i++)
         for (auto edge : edges_list[i])
             edge->setFlux(0);
-    
+*/    
     heights[TARGET] = max;
 
     for (auto edge : edges_list[TARGET]) {
         edge->setFlux(edge->getCapacity());
         overflows[edge->getTarget()] = edge->getCapacity();
         overflows[TARGET] -= edge->getCapacity();
-        for (auto new_edge : edges_list[edge->getTarget()])
+        Edge* reverse = edge->getReverse();
+        reverse->setFlux(-edge->getCapacity());
+    /*  for (auto new_edge : edges_list[edge->getTarget()])
             if (new_edge->getTarget() == TARGET) {
                 new_edge->setFlux(-edge->getCapacity());
                 break;
             }
+    */
     }
 }
 
@@ -176,8 +186,12 @@ int main() {
     int prodTotal = 0;
     while (counter-- > 0){
         std::cin >> prod;
-        edges[SOURCE].push_front(new Edge(SOURCE, 0, index)); //edge from source to supplier
-        edges[index].push_front(new Edge(index, prod, SOURCE)); //reverse edge
+        Edge *reverse = new Edge(SOURCE, 0, index);
+        Edge *newEdge = new Edge(index, prod, SOURCE);
+        edges[SOURCE].push_front(reverse); //edge from source to supplier
+        edges[index].push_front(newEdge); //reverse edge
+        newEdge->setReverse(reverse);
+        reverse->setReverse(newEdge);
         index++;
         prodTotal += prod;
     }
@@ -185,16 +199,24 @@ int main() {
     int capTotal = 0;
     while (counter-- > 0) {
         std::cin >> cap;
-        edges[index].push_front(new Edge(index,0,index + e)); //set capacity of storage as 2 vertexes
-        edges[index + e].push_front(new Edge(index + e,cap,index));
+        Edge * reverse = new Edge(index,0,index + e);
+        Edge * newEdge = new Edge(index + e,cap,index);
+        edges[index].push_front(reverse); //set capacity of storage as 2 vertexes
+        edges[index + e].push_front(newEdge);
+        newEdge->setReverse(reverse);
+        reverse->setReverse(newEdge);
         index++;
         capTotal += e;
     }
 
     while (t-- > 0) {
         std::cin >> o >> d >> c;
-        edges[validate_index(o)].push_front(new Edge(validate_index(o),0,d)); //set edges inside graph while validating if origin is storage
-        edges[d].push_front(new Edge(d,c,validate_index(o)));
+        Edge * reverse = new Edge(validate_index(o),0,d);
+        Edge *newEdge = new Edge(d,c,validate_index(o));
+        edges[validate_index(o)].push_front(reverse); //set edges inside graph while validating if origin is storage
+        edges[d].push_front(newEdge);
+        newEdge->setReverse(reverse);
+        reverse->setReverse(newEdge);
     }
 
 
@@ -221,7 +243,7 @@ int main() {
     */
     //std::cout << "=== Results ===" << std::endl;
     std::cout << overflows[SOURCE] << std::endl; // the output
-    DFS(edges, overflows, max);
+    //DFS(edges, overflows, max);
     
     bool changed = false; 
     for (int i = f + 2 + e; i < max; i++) { // for each storage
