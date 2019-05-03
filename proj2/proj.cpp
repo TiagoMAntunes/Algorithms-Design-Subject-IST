@@ -5,6 +5,8 @@
 #define SOURCE 0
 #define TARGET 1
 #define MIN(A,B) ((A) < (B) ? (A) : (B))
+#define WHITE 0
+#define BLACK 1
 
 class Edge{
         int _capacity;
@@ -140,6 +142,21 @@ void relabel_to_front(std::forward_list<Edge *>* edges, int max, int * overflows
     */    
         it++;
     }
+}
+
+void DFS_visit(int u, std::forward_list<Edge *> * edges, int * colors) {
+    colors[u] = BLACK;
+
+    for (auto edge : edges[u])
+        if (colors[edge->getTarget()] == WHITE && edge->getCapacity() != abs(edge->getFlux()))
+            DFS_visit(edge->getTarget(), edges, colors);
+}
+
+void DFS(std::forward_list<Edge *> *  edges, int * colors, int max) {
+    for (int i = 0; i < max; i++)
+        colors[i] = WHITE;
+
+    DFS_visit(TARGET, edges, colors);
 }
 
 int main() {
