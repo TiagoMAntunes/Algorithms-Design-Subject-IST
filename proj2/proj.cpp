@@ -239,12 +239,27 @@ int main() {
     */
     //std::cout << "=== Results ===" << std::endl;
     std::cout << overflows[SOURCE] << std::endl; // the output
+    int findGap[max+1];
+    for (int i = 0; i < max; i++) {
+    	findGap[i] = -1;
+    }
+    for (int i = 0; i < max; i++) {
+    	findGap[heights[i]] = 1;
+    }
+
+    int gap = max;
+    for (int i = max-1; i >= 0; i--) {
+    	if (findGap[i] == -1){
+    		gap = i;
+    		break;
+    	}
+    }
     //DFS(edges, overflows, max);
     
     bool changed = false; 
     for (int i = f + 2 + e; i < max; i++) { // for each storage
         int origin = i - e;
-        if (heights[i] >= max && heights[origin] < max) {
+        if (heights[i] >= gap && heights[origin] < gap) {
             if (changed)
                 std::cout << " ";
             else
@@ -256,7 +271,7 @@ int main() {
     std::priority_queue<Edge *, std::vector<Edge*>, Compare> edges1;
     for (i = 2; i < f + 2; i++) { //for each supplier
         for (auto edge : edges[i])
-            if (heights[i] < max && heights[edge->getTarget()] >= max && edge->getTarget() != 0) //avoid back edges to source
+            if (heights[i] < gap && heights[edge->getTarget()] >= gap && edge->getTarget() != 0) //avoid back edges to source
                 edges1.push(edge);
     }
 
