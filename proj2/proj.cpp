@@ -248,5 +248,6 @@ int main() {
     delete[] edges;
     delete[] overflows;
     delete[] heights;
+    delete[] neighbors;
     return 0;  
 }
