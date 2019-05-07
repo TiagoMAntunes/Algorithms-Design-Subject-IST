@@ -58,12 +58,6 @@ int validate_index(int id) {
 void push(int u, int v, int * overflows, Edge * edge, std::forward_list<Edge *>& edges) {
     int available_flux = MIN(overflows[u], edge->residualCapacity());
     edge->increaseFlux(available_flux);
-    /*for (auto new_edge : edges) //update back edge
-        if (new_edge->getTarget() == u){
-            new_edge->setFlux(-edge->getFlux());
-            break;
-        }  
-    */
     Edge * reverse = edge->getReverse();
     reverse->setFlux(-edge->getFlux());  
     overflows[u] -= available_flux;
@@ -83,11 +77,7 @@ void initialize_pre_flow(int max, int * overflows, int * heights, std::forward_l
         overflows[i] = 0;
         heights[i] = 0;
     }
-
-/*    for (int i = 0; i < max; i++)
-        for (auto edge : edges_list[i])
-            edge->setFlux(0);
-*/    
+   
     heights[TARGET] = max;
 
     for (auto edge : edges_list[TARGET]) {
@@ -96,12 +86,6 @@ void initialize_pre_flow(int max, int * overflows, int * heights, std::forward_l
         overflows[TARGET] -= edge->getCapacity();
         Edge* reverse = edge->getReverse();
         reverse->setFlux(-edge->getCapacity());
-    /*  for (auto new_edge : edges_list[edge->getTarget()])
-            if (new_edge->getTarget() == TARGET) {
-                new_edge->setFlux(-edge->getCapacity());
-                break;
-            }
-    */
     }
 }
 
@@ -126,44 +110,17 @@ void discharge(int u, int * overflows, int * heights, std::forward_list<Edge*>* 
 
 void relabel_to_front(std::forward_list<Edge *>* edges, int max, int * overflows, int * heights) {
     initialize_pre_flow(max, overflows, heights, edges);
-/* DEBUG 
-    for (int i = 0; i < 2 + f + e * 2; i++) {
-        std::cout << "------------Analyzing PRE FLOW " << i  << std::endl;
-        for (auto edge : edges[i])
-            std::cout << i << " to " << edge->getTarget() << " flux=" << edge->getFlux() << " capacity=" << edge->getCapacity() << std::endl;
-    }
-*/
+
     std::queue<int>Q;
     for (int i = 2; i < max; i++) Q.push(i);
     int u;
     while(!Q.empty() && overflows[TARGET] != -overflows[SOURCE]) {
         u = Q.front();
         Q.pop();
-
-      //  int e = overflows[u]; //==============
-
-        discharge(u, overflows, heights, edges, Q);
-        
-    /* DEBUG    
-        std::cout << "v = " << *it << ", oldh = " << oldh << ", h = " << heights[*it] << ", e[v] = " << e << std::endl;
-    */    
+        discharge(u, overflows, heights, edges, Q);  
     }
 }
 
-void DFS_visit(int u, std::forward_list<Edge *> * edges, int * colors) {
-    colors[u] = BLACK;
-
-    for (auto edge : edges[u])
-        if (colors[edge->getTarget()] == WHITE && edge->getCapacity() != abs(edge->getFlux()))
-            DFS_visit(edge->getTarget(), edges, colors);
-}
-
-void DFS(std::forward_list<Edge *> *  edges, int * colors, int max) {
-    for (int i = 0; i < max; i++)
-        colors[i] = WHITE;
-
-    DFS_visit(SOURCE, edges, colors);
-}
 
 int main() {
     //parse input
@@ -224,27 +181,16 @@ int main() {
         neighbors[i] = edges[i].begin();
     relabel_to_front(edges, max, overflows, heights);
 
-    //just for debugging
-    /*
-    for (int i = 0; i < max; i++) {
-        std::cout << "------------Analyzing " << i  << std::endl;
-        for (auto edge : edges[i])
-            std::cout << i << " to " << edge->getTarget() << " flux=" << edge->getFlux() << " capacity=" << edge->getCapacity() << std::endl;
-    }
-    
-    std::cout << "=== Analyzing Heights" << std::endl;
-    for (int i = 0; i < max; i++) {
-        std::cout << "h[" << i << "] = " << heights[i] << std::endl;
-    }
-    */
-    //std::cout << "=== Results ===" << std::endl;
+
     std::cout << overflows[SOURCE] << std::endl; // the output
     int findGap[max+1];
     for (int i = 0; i < max; i++) {
     	findGap[i] = -1;
     }
     for (int i = 0; i < max; i++) {
-    	findGap[heights[i]] = 1;
+    	if (heights[i] < max) {
+    		findGap[heights[i]] = 1;
+    	}
     }
 
     int gap = max;
@@ -254,7 +200,6 @@ int main() {
     		break;
     	}
     }
-    //DFS(edges, overflows, max);
     
     bool changed = false; 
     for (int i = f + 2 + e; i < max; i++) { // for each storage
@@ -301,5 +246,7 @@ int main() {
             delete edge; 
     }
     delete[] edges;
+    delete[] overflows;
+    delete[] heights;
     return 0;  
 }
